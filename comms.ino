@@ -23,7 +23,6 @@ boolean comms_waitForNextCommand(char *buf)
     buf[i] = 0;
   }
   long lastRxTime = 0L;
-
   // loop while there's there isn't a terminated command.
   // (Note this might mean characters ARE arriving, but just
   //  that the command hasn't been finished yet.)
@@ -251,6 +250,15 @@ void comms_extractParams(char* inS)
   }
 
   inNoOfParams = paramNumber;
+  if (echoingStoredCommands)
+     {
+    lcd.setCursor(0,0); lcd.print(cleanline);  
+    lcd.setCursor(0,0); lcd.print(inCmd);   lcd.print(" "); 
+    if ((paramNumber>1) && strlen(inParam1)<10) {lcd.setCursor(4,0); lcd.print(inParam1); } 
+    if (paramNumber>2) {lcd.print(","); lcd.print(inParam2); }
+//   if (paramNumber>3) {lcd.print(","); lcd.print(inParam3); }
+//   lcd.print("("); lcd.print(paramNumber); lcd.print(")");
+    }
 
 #ifdef DEBUG_COMMS
     if (debugComms) {
@@ -276,12 +284,7 @@ void comms_ready()
   Serial.println(READY_STR);
 #ifdef DEBUG_STATE
   Serial.print(MSG_D_STR);
-  Serial.print(F("Display touched:"));
-  Serial.println(displayTouched);
-  Serial.print(MSG_D_STR);
-  Serial.print(F("Pin2:"));
-  Serial.println(analogRead(2));
-#endif
+ #endif
 }
 
 void comms_drawing()

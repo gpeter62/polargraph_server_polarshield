@@ -182,7 +182,7 @@ void changeLengthRelative(long tA, long tB)
   
   while (motorA.distanceToGo() != 0 || motorB.distanceToGo() != 0)
   {
-    //impl_runBackgroundProcesses();
+    impl_runBackgroundProcesses();
     if (currentlyRunning)
     {
       if (usingAcceleration)

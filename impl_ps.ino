@@ -17,7 +17,7 @@ mega/polarshield version of the polargraph.
 have command storage features. */
 void impl_processCommand(String com)
 {
-  lcd_echoLastCommandToDisplay(com, "usb:");
+//  lcd_echoLastCommandToDisplay(com, "usb:");
   
   // check for change mode commands
   if (com.startsWith(CMD_MODE_STORE_COMMANDS)
@@ -100,21 +100,21 @@ void impl_executeCommand(String &com)
 }
 
 /** Polarshield implementation of runBackgroundProcesses. This is basically stuff to do with 
-the screen.
+the screen.  Most of the time is spent here!
 */
 void impl_runBackgroundProcesses()
 {
-#ifdef USE_LCD  
   lcd_checkForInput();
-  lcd_updateDisplay();
-#endif
+//  lcd_updateDisplay(true);
+
       
   long motorCutoffTime = millis() - lastOperationTime;
   if ((automaticPowerDown) && (powerIsOn) && (motorCutoffTime > motorIdleTimeBeforePowerDown))
   {
-    Serial.println("Powering down because of inactivity.");
+    Serial.print("Powering down because of inactivity:");
+    Serial.print(motorCutoffTime /1000); Serial.println("sec");
     lcd_runEndScript();
-    lcd_updateDisplay();
+//    lcd_updateDisplay();
   }
   
   if (swirling)
@@ -196,7 +196,7 @@ void impl_exec_execFromStore(String inFilename)
 #endif
             Serial.print(F("Executing command:"));
             Serial.println(command);
-            if (echoingStoredCommands) lcd_echoLastCommandToDisplay(command, inFilename+": ");
+//            if (echoingStoredCommands) lcd_echoLastCommandToDisplay(command, inFilename+": ");
             impl_executeCommand(command);
           }
 #ifdef DEBUG_SD        

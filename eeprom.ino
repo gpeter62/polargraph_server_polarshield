@@ -19,7 +19,7 @@ whenever a value is written to the EEPROM.
 
 void eeprom_resetEeprom()
 {
-  for (int i = 0; i < (EEPROM_PENLIFT_UP +2); i++)
+  for (int i = 0; i < (EEPROM_END +2); i++)
   {
     EEPROM.write(i, 0);
   }
@@ -82,7 +82,7 @@ void eeprom_loadSpoolSpec()
 void eeprom_loadPenLiftRange()
 {
   EEPROM_readAnything(EEPROM_PENLIFT_DOWN, downPosition);
-  if (downPosition < 0)
+  if (downPosition <= 0)
   {
     downPosition = DEFAULT_DOWN_POSITION;
   }
@@ -90,7 +90,7 @@ void eeprom_loadPenLiftRange()
   Serial.println(downPosition);
 
   EEPROM_readAnything(EEPROM_PENLIFT_UP, upPosition);
-  if (upPosition < 0)
+  if (upPosition <= 0)
   {
     upPosition = DEFAULT_UP_POSITION;
   }
@@ -137,12 +137,45 @@ void eeprom_loadSpeed()
   if (int(currentMaxSpeed) < 1) {
     currentMaxSpeed = 800.0;
   }
+  Serial.print(F("Loaded motor maxspeed:"));
+  Serial.println(currentMaxSpeed);
     
   EEPROM_readAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
   if (int(currentAcceleration) < 1) {
     currentAcceleration = 800.0;
   }
+  Serial.print(F("Loaded motor acceleration:"));
+  Serial.println(currentAcceleration);
 }
+
+void eeprom_GCode_params()
+{
+  EEPROM_readAnything(EEPROM_GXOFFS, GXoffs);
+  if (GXoffs<=0) GXoffs = 355.60; 
+  Serial.print(F("GCODE X offset:"));
+  Serial.println(GXoffs);
+  
+  EEPROM_readAnything(EEPROM_GYOFFS, GYoffs);
+  if (GYoffs<=0) GYoffs = 233.59; 
+  Serial.print(F("GCODE Y offset:"));
+  Serial.println(GYoffs);
+  
+  EEPROM_readAnything(EEPROM_GDIV, Gdiv);
+  if (Gdiv<=0) Gdiv = 0.45; 
+  Serial.print(F("GCODE division scale:"));
+  Serial.println(Gdiv);
+  
+  EEPROM_readAnything(EEPROM_MACH_X_OFFS,MACH_X_offs);
+  if (MACH_X_offs<=0) MACH_X_offs = 110.0; 
+  Serial.print(F("GCODE MACHINE X offset:"));
+  Serial.println(MACH_X_offs);
+  
+  EEPROM_readAnything(EEPROM_MACH_Y_OFFS,MACH_Y_offs);
+  if (MACH_Y_offs <=0) MACH_Y_offs = 190.0;
+  Serial.print(F("GCODE MACHINE Y offset:"));
+  Serial.println(MACH_Y_offs);
+  }
+
 
 void eeprom_loadMachineSpecFromEeprom()
 {
@@ -154,6 +187,7 @@ void eeprom_loadMachineSpecFromEeprom()
   eeprom_loadMachineName();
   eeprom_loadPenLiftRange();
   eeprom_loadSpeed();
+  eeprom_GCode_params();
 
   Serial.print("Didn't load penWidth: ");
   Serial.println(penWidth);
@@ -180,5 +214,29 @@ void eeprom_loadMachineSpecFromEeprom()
   Serial.println();
 
   maxLength = 0;
+}
+
+void eeprom_save_factory_defaults()
+{
+    EEPROM_writeAnything(EEPROM_MACHINE_WIDTH, defaultMachineWidth);
+    EEPROM_writeAnything(EEPROM_MACHINE_HEIGHT, defaultMachineHeight);
+    for (int i = 0; i < 8; i++)
+         EEPROM.write(EEPROM_MACHINE_NAME+i, machineName[i]);
+    EEPROM_writeAnything(EEPROM_MACHINE_MM_PER_REV, defaultMmPerRev);
+    EEPROM_writeAnything(EEPROM_MACHINE_STEPS_PER_REV, defaultStepsPerRev);
+    EEPROM_writeAnything(EEPROM_MACHINE_STEP_MULTIPLIER, defaultStepMultiplier);
+    EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_SPEED, currentMaxSpeed);
+    EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
+    EEPROM_writeAnything(EEPROM_MACHINE_PEN_WIDTH, penWidth);
+    EEPROM_writeAnything(EEPROM_MACHINE_HOME_A, homeA);
+    EEPROM_writeAnything(EEPROM_MACHINE_HOME_B, homeB);
+    EEPROM_writeAnything(EEPROM_PENLIFT_DOWN, DEFAULT_DOWN_POSITION);
+    EEPROM_writeAnything(EEPROM_PENLIFT_UP, DEFAULT_UP_POSITION);
+    EEPROM_writeAnything(EEPROM_GXOFFS, GXoffs);
+    EEPROM_writeAnything(EEPROM_GYOFFS, GYoffs);
+    EEPROM_writeAnything(EEPROM_GDIV, Gdiv);
+    EEPROM_writeAnything(EEPROM_MACH_X_OFFS, MACH_X_offs);
+    EEPROM_writeAnything(EEPROM_MACH_Y_OFFS, MACH_Y_offs);
+    EEPROM_writeAnything(EEPROM_FACTORY_RESET, (byte)0);
 }
 

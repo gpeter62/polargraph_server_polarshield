@@ -90,5 +90,15 @@ void penlift_penDown()
 
 void penlift_testRange()
 {
-  
+    if (isPenUp) penlift_movePen(upPosition, downPosition, penLiftSpeed);
+    delay(200);
+    penlift_movePen(downPosition, upPosition, penLiftSpeed);
+    delay(200);
+    penlift_movePen(upPosition, downPosition, penLiftSpeed);
+    delay(200);
+    penlift_movePen(downPosition, upPosition, penLiftSpeed);
+    delay(200);
+    if (!isPenUp) penlift_movePen(upPosition, downPosition, penLiftSpeed);
+
+          
 }

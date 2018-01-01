@@ -21,6 +21,9 @@ routines are here.
 boolean exec_executeBasicCommand(String &com)
 {
   boolean executed = true;
+  
+  commandFileLineCount++;
+  
   if (com.startsWith(CMD_CHANGELENGTH))
     exec_changeLength();
   else if (com.startsWith(CMD_CHANGELENGTHDIRECT))
@@ -61,9 +64,22 @@ boolean exec_executeBasicCommand(String &com)
     exec_reportMachineSpec();
   else if (com.startsWith(CMD_RESETEEPROM))
     eeprom_resetEeprom();
+// by GP    
+  else if (com.startsWith(CMD_G21))
+    exec_G21();
+  else if (com.startsWith(CMD_G90))
+    exec_G90();      
+  else if (com.startsWith(CMD_G99)) 
+    exec_G99();  
+  else if (com.startsWith(CMD_G1))
+    {
+    if (strcmp(inParam1,"Z0") == 0)  {inNoOfParams=0; penlift_penUp();}
+    else if (strcmp(inParam1,"Z1") == 0)  {inNoOfParams=0; penlift_penDown();}
+    else exec_G1();
+    }    
   else
     executed = false;
-
+  LCD_Motors();  //by GP
   return executed;
 }
 
@@ -241,6 +257,7 @@ void exec_setMotorAcceleration()
   if (inNoOfParams == 3 && atoi(inParam2) == 1)
     EEPROM_writeAnything(EEPROM_MACHINE_MOTOR_ACCEL, currentAcceleration);
 }
+
 void exec_setMotorAcceleration(float accel)
 {
   currentAcceleration = accel;
@@ -435,7 +452,7 @@ float desiredSpeed(long distanceTo, float currentSpeed, float acceleration)
     float requiredSpeed;
 
     if (distanceTo == 0)
-	return 0.0f; // We're there
+  return 0.0f; // We're there
 
     // sqrSpeed is the signed square of currentSpeed.
     float sqrSpeed = sq(currentSpeed);
@@ -447,29 +464,68 @@ float desiredSpeed(long distanceTo, float currentSpeed, float acceleration)
     // if v^^2/2as is the the left of target, we will arrive at 0 speed too far -ve, need to accelerate clockwise
     if ((sqrSpeed / twoa) < distanceTo)
     {
-	// Accelerate clockwise
-	// Need to accelerate in clockwise direction
-	if (currentSpeed == 0.0f)
-	    requiredSpeed = sqrt(twoa);
-	else
-	    requiredSpeed = currentSpeed + fabs(acceleration / currentSpeed);
+  // Accelerate clockwise
+  // Need to accelerate in clockwise direction
+  if (currentSpeed == 0.0f)
+      requiredSpeed = sqrt(twoa);
+  else
+      requiredSpeed = currentSpeed + fabs(acceleration / currentSpeed);
 
-	if (requiredSpeed > currentMaxSpeed)
-	    requiredSpeed = currentMaxSpeed;
+  if (requiredSpeed > currentMaxSpeed)
+      requiredSpeed = currentMaxSpeed;
     }
     else
     {
-	// Decelerate clockwise, accelerate anticlockwise
-	// Need to accelerate in clockwise direction
-	if (currentSpeed == 0.0f)
-	    requiredSpeed = -sqrt(twoa);
-	else
-	    requiredSpeed = currentSpeed - fabs(acceleration / currentSpeed);
-	if (requiredSpeed < -currentMaxSpeed)
-	    requiredSpeed = -currentMaxSpeed;
+  // Decelerate clockwise, accelerate anticlockwise
+  // Need to accelerate in clockwise direction
+  if (currentSpeed == 0.0f)
+      requiredSpeed = -sqrt(twoa);
+  else
+      requiredSpeed = currentSpeed - fabs(acceleration / currentSpeed);
+  if (requiredSpeed < -currentMaxSpeed)
+      requiredSpeed = -currentMaxSpeed;
     }
     
     //Serial.println(requiredSpeed);
     return requiredSpeed;
 }
+
+
+//GP extensions
+void exec_G99()   //comment line
+{}
+
+void exec_G21()
+{}
+
+void exec_G90()
+{}
+
+void exec_G1()    //G1 mozgatás relatív utolsó ponthoz képest
+{
+      float endA1 = (float)atof(inParam1);
+      float endB1 = (float)atof(inParam2);
+      float endA2,endB2;
+
+//      lcd.setCursor(0,1);
+//      lcd.print("                    ");
+//      lcd.setCursor(0,1);
+      
+        
+      endA1 = (MACH_X_offs + (endA1 + GXoffs) * Gdiv) *  stepsPerMM;
+      endB1 = (MACH_Y_offs + (endB1 + GYoffs) * Gdiv) *  stepsPerMM;
+//      lcd.print(endA1); lcd.print("/"); lcd.print(endB1); 
+
+ 
+      endA2 = getMachineA(endA1,endB1) / stepMultiplier; 
+      endB2 = getMachineB(endA1,endB1) / stepMultiplier;    //visszaszámolás a gép rendszerébe
+//      lcd.print(endA2); lcd.print("/"); lcd.print(endB2); 
+//      changeLength(endA2,endB2);
+    
+// saját rajzoló függvényének átadva a paramétereket 
+      dtostrf(endA2, 6, 2, inParam1);  dtostrf(endB2, 6, 2, inParam2);  dtostrf(2, 6, 2, inParam3);
+      exec_changeLengthDirect();
+}
+
+
 
