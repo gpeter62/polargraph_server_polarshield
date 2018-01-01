@@ -1,66 +1,38 @@
-polargraph_server_a1
+polargraph_serverGP
 ====================
 
-Polargraph Server for Arduino UNO and MEGA compatible boards using Adafruit motorshields,
-serial stepper drivers (eg Easy Drivers, stepsticks etc) or signal amplifiers (eg ULN2003s).
+My project is based on Sandy Noble's super polargraph.co.uk project
 
-It is called *_a1* because it is the version for the first arduino (ie Uno, or Duemilanove).  
-Bit obtuse that, I know.
+This Polargraph server  version is connected to the fantastic GCODE converter of Scott-Cooper!
 
-For convenience, I have pre-compiled and included two hex files:
+////////////////////////////////////////////////////////////////////////////////////////////////
 
-1. **polargraph_server_a1_adafruit_v1.cpp.hex** - Is for motorshield v1.
-2. **polargraph_server_a1_adafruit_v2.cpp.hex** - Is for the new motorshield v2.
+My Polargraph server works WITHOUT Polarshield touchscreen, only with standard components!
+Arduino Mega
+standard LCD 4x20
+1 x Rotary Encoder
+4 x pushbutton
 
-Motor driver:
--------------
+1 x Datalogger Shield with SD card. 
+	Modified for MEGA pinout!!!
+	UNO  ----> MEGA
+	A4,A5  --> Pin 20,21   (SCL,SDA)
+	11,12,13-->50,51,52 (SPI bus)
 
-This firmware works for:
+2 x PicoDrive Stepper driver modul
 
-1. Adafruit Motorshield v1 that uses AFMotor as it's software driver
-2. Adafruit Motorshield v2 that uses Adafruit_MotorShield as it's software driver
-3. Generic serial stepper drivers, eg Stepsticks or Easy Drivers
-4. Four-wire signal amplifier, eg UNL2003
+Extended GCODE command set. Drawing directly from SD card or from PC with Sandy Noble's Controller.
+https://github.com/euphy/polargraphcontroller 
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
-To switch between the different drivers, and to configure a few other bits and pieces,
-comment out some lines near the beginning of polargraph_server_a1.ino.
+This Polargraph server is connected with the fantastic GCODE converter of Scott-Cooper!
+Original version: https://github.com/Scott-Cooper/Drawbot_image_to_gcode_v2
+Adapted for Polargraph queue format: https://github.com/gpeter62/Drawbot_image_to_gcode_v2
 
-
-There are five config sections:
-
-1. Specify what kind of controller board you are using
-2. Add some libraries if you have a MEGA
-3. Specify what kind of motor driver you are using:
-  1. Adafruit Motorshield v1
-  2. Adafruit Motorshield v2
-  3. Discrete stepper drivers (eg EasyDriver, stepstick, Pololu gear).*
-  4. Signal amplifier like a UNL2003*
-4.  Turn on some debugging code
-5.  Disable program features if you need to free up space
-
-* For motor drivers iii and iv, you will need to change the values in
-  configuration.ino to set the exact pins the drivers are wired up to.
-
-
-The program has a core part that consists of the following files that are common to all Polargraph Server versions:
-
-- comms.ino
-- configuration.ino
-- eeprom.ino
-- exec.ino
-- penlift.ino
-- pixel.ino
-- util.ino
-
-and 
-- polargraph_server_a1.ino
-
-which is named for the project.
-
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 Polargraph
 ----------
-
 Polargraph is the name of the project, and is a portmanteau word invented by the writer
 solely for this purpose. Any machine that runs the Polargraph software is technically a 
 polargraph machine. I usually reserve the big-P "Polargraph" for things made by
@@ -75,4 +47,4 @@ Released under GNU License version 3.
 
 http://www.polargraph.co.uk
 
-https://github.com/euphy/polargraph_server_a1
+
