@@ -36,8 +36,8 @@ Offset and size% in case of external GCode source
 
 // 4.  Turn on some debugging code if you want horror
 // =================================================
-//#define DEBUG
-//#define DEBUG_COMMS
+#define DEBUG
+#define DEBUG_COMMS
 //#define DEBUG_PENLIFT
 //#define DEBUG_PIXEL
 
@@ -360,10 +360,11 @@ boolean storeCommands = false;
 boolean drawFromStore = false;
 String commandFilename = "";
 long commandFileLineCount = 0;
+#define MAXNOOFFILES 15
 int NoOfFiles = 0;
-int MaxNoOfFiles = 15;    //--> Set Txtfile[MaxNoOfFiles][] according this value
+int MaxNoOfFiles = MAXNOOFFILES;    //--> Set Txtfile[MaxNoOfFiles][] according this value
 int commandFileNo = 0;
-char Txtfile [15][13]; 
+char Txtfile [MAXNOOFFILES+1][13]; 
 
 // sd card stuff
 const int chipSelect = 53;

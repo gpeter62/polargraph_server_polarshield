@@ -155,23 +155,6 @@ const struct Menudef Menu[] =
 };
 
 
-void InitKeyboard()
-{
-  Serial.println("Keyboard Init...");
-  pinMode(BtnEnter_Pin,INPUT_PULLUP);
-  pinMode(BtnExit_Pin,INPUT_PULLUP);
-  pinMode(BtnLeft_Pin,INPUT_PULLUP);
-  pinMode(BtnRight_Pin,INPUT_PULLUP);
-  
-  pinMode(pinA, INPUT_PULLUP); // set pinA as an input, pulled HIGH
-  pinMode(pinB, INPUT_PULLUP); // set pinB as an input, pulled HIGH
-  pinMode(pinC, INPUT_PULLUP); // set pinC as an input, pulled HIGH
-
-  attachInterrupt(4,PinA,RISING); // set an interrupt on PinA,
-  attachInterrupt(5,PinB,RISING); // set an interrupt on PinB, 
-}
-
-
 void TestKeyboard()
 {
   Serial.println("Testing Keyboard...");
@@ -194,6 +177,25 @@ void TestRotary()
   if (digitalRead(pinC) == 0) return;
   }
 }
+
+
+void InitKeyboard()
+{
+  Serial.println("Keyboard Init...");
+  pinMode(BtnEnter_Pin,INPUT_PULLUP);
+  pinMode(BtnExit_Pin,INPUT_PULLUP);
+  pinMode(BtnLeft_Pin,INPUT_PULLUP);
+  pinMode(BtnRight_Pin,INPUT_PULLUP);
+  
+  pinMode(pinA, INPUT_PULLUP); // set pinA as an input, pulled HIGH
+  pinMode(pinB, INPUT_PULLUP); // set pinB as an input, pulled HIGH
+  pinMode(pinC, INPUT_PULLUP); // set pinC as an input, pulled HIGH
+
+  attachInterrupt(4,PinA,RISING); // set an interrupt on PinA,
+  attachInterrupt(5,PinB,RISING); // set an interrupt on PinB, 
+}
+
+
 
 
 boolean GetEnter()
