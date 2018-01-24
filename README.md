@@ -30,6 +30,7 @@ But the function !FactReset will save the current default values of the main pro
 
 This Polargraph server is connected with the fantastic GCODE converter of Scott-Cooper!
 Original version: https://github.com/Scott-Cooper/Drawbot_image_to_gcode_v2
+
 Adapted for Polargraph queue format: https://github.com/gpeter62/Drawbot_image_to_gcode_v2
 
 Set2-GCODE submenu of Polargraph contains the parameters to convert the different coordinate systems. (Offsets, size%)
