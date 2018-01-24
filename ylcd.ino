@@ -508,63 +508,85 @@ void ReturnHomeMotors()
 
 void PenLiftUpSetup()
 {
-  encoderPos = 0; 
-  while (true)
+  encoderPos = 0;
+  long lastcheck;
+  boolean exitflag;
+  exitflag = false;
+  lastcheck = millis();
+   
+  while (! exitflag)
   {
-    if (GetExit())  {while(GetExit());   break; }
-    if (GetEnter()) {while(GetEnter());  break; }
-    if (upPosition < 300) {
-        upPosition += encoderPos;
-        if (isPenUp)
-          penlift_movePen(upPosition-15, upPosition, penLiftSpeed);
-        else
-          penlift_movePen(downPosition, upPosition, penLiftSpeed);
-        isPenUp = true;
+    while ((millis()-lastcheck)<500)
+      {
+      if (GetExit())  {while(GetExit());  exitflag = true; break;}
+      if (GetEnter()) {while(GetEnter()); exitflag = true; break;}
       }
-    if (upPosition > 0) {
-        upPosition -= encoderPos;  encoderPos = 0;
-        if (isPenUp)
-          penlift_movePen(upPosition+10, upPosition, penLiftSpeed);
-        else
-          penlift_movePen(downPosition, upPosition, penLiftSpeed);
-        isPenUp = true;
-        }    
+    lastcheck = millis();  
+    upPosition += encoderPos; 
+    encoderPos = 0;
+    if (upPosition <0) upPosition = 0;
+    if (upPosition >150) upPosition = 150;
+    if (isPenUp)
+        {
+         penlift_movePen(upPosition, upPosition-10, penLiftSpeed);
+         while ((millis()-lastcheck)<500)
+           {
+           if (GetExit())  {while(GetExit());  exitflag = true; break;}
+           if (GetEnter()) {while(GetEnter()); exitflag = true; break;}
+           }
+         lastcheck = millis();
+         penlift_movePen(upPosition-10, upPosition, penLiftSpeed);
+        } 
+    else
+         penlift_movePen(downPosition, upPosition, penLiftSpeed);
+    isPenUp = true;
+
     lcd.setCursor(inputX,inputY); 
     lcd.print("(   )"); 
     lcd.setCursor(inputX+1,inputY); 
     lcd.print(upPosition);
-    delay(200);
   }    
 }
 
 void PenLiftDownSetup()
 {
-  encoderPos = 0; 
-  while (true)
+  encoderPos = 0;
+  long lastcheck;
+  boolean exitflag;
+  exitflag = false;
+  lastcheck = millis();
+ 
+  while (! exitflag)
   {
-    if (GetExit())  {while(GetExit());   break; }
-    if (GetEnter()) {while(GetEnter());  break; }
-    if (downPosition < 300) {
-        downPosition += encoderPos; encoderPos = 0;
-        if (isPenUp)
-          penlift_movePen(upPosition, downPosition, penLiftSpeed);
-        else
-          penlift_movePen(downPosition-10, downPosition, penLiftSpeed);
-        isPenUp = false;
+    while ((millis()-lastcheck)<500)
+      {
+      if (GetExit())  {while(GetExit());  exitflag = true; break;}
+      if (GetEnter()) {while(GetEnter()); exitflag = true; break;}
       }
-    if (downPosition > 0) {
-        downPosition -= encoderPos; encoderPos = 0;
-        if (isPenUp)
-          penlift_movePen(upPosition, downPosition, penLiftSpeed);
-        else
-          penlift_movePen(downPosition+15, downPosition, penLiftSpeed);
-        isPenUp = false;
-      }  
+    lastcheck = millis();  
+    downPosition += encoderPos; 
+    encoderPos = 0;
+    if (downPosition <0)   downPosition = 0;
+    if (downPosition >150) downPosition = 150;
+    if (isPenUp)
+        penlift_movePen(upPosition, downPosition, penLiftSpeed);
+    else
+        {
+        penlift_movePen(downPosition, downPosition+10, penLiftSpeed);
+        while ((millis()-lastcheck)<500)
+          {
+          if (GetExit())  {while(GetExit());  exitflag = true; break;}
+          if (GetEnter()) {while(GetEnter()); exitflag = true; break;}
+         }
+        lastcheck = millis();
+        penlift_movePen(downPosition+10, downPosition, penLiftSpeed);
+        }
+    isPenUp = false;
+ 
     lcd.setCursor(inputX,inputY); 
     lcd.print("(   )"); 
     lcd.setCursor(inputX+1,inputY); 
     lcd.print(downPosition);
-    delay(200);
   }    
 }
 
@@ -586,7 +608,9 @@ void lcd_processCommand()
       break;
     case BUTTON_RESET:
       break;
-    case BUTTON_SET_HOME:      
+    case BUTTON_SET_HOME:
+      lcd.setCursor(0,0); lcd.print(cleanline);  
+      lcd.setCursor(0,0); lcd.print("HOME:"); lcd.print(homeA);   lcd.print(",");   lcd.print(homeB);     
       SetHomeMotors();
       break;
     case BUTTON_RETURN_HOME:      
@@ -681,7 +705,7 @@ void lcd_processCommand()
       penlift_testRange();
       break;  
     case BUTTON_PENLIFT_SAVE_TO_EEPROM:
-      Serial.println("HJey");
+      Serial.println("Saving Penlift to EEPROM");
       EEPROM_writeAnything(EEPROM_PENLIFT_DOWN, downPosition);
       EEPROM_writeAnything(EEPROM_PENLIFT_UP, upPosition);
       eeprom_loadPenLiftRange();
@@ -885,7 +909,7 @@ void LoadFilenameArray()
      }
      entry.close();
    }  //end while
-  if (NoOfFiles>0) commandFilename = Txtfile[0];
+  if (NoOfFiles>0) {commandFilename = Txtfile[0]; commandFileNo = 1;}
   Serial.print("Now command filename: ");
   Serial.println(commandFilename);
 }  

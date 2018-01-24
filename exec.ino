@@ -501,7 +501,7 @@ void exec_G21()
 void exec_G90()
 {}
 
-void exec_G1()    //G1 mozgatás relatív utolsó ponthoz képest
+void exec_G1()    //G1 move relative to the last point
 {
       float endA1 = (float)atof(inParam1);
       float endB1 = (float)atof(inParam2);
@@ -522,7 +522,7 @@ void exec_G1()    //G1 mozgatás relatív utolsó ponthoz képest
 //      lcd.print(endA2); lcd.print("/"); lcd.print(endB2); 
 //      changeLength(endA2,endB2);
     
-// saját rajzoló függvényének átadva a paramétereket 
+// call the drawing function with the new parameteres
       dtostrf(endA2, 6, 2, inParam1);  dtostrf(endB2, 6, 2, inParam2);  dtostrf(2, 6, 2, inParam3);
       exec_changeLengthDirect();
 }
