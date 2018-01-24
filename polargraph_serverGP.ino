@@ -49,7 +49,7 @@ boolean debugComms = false;
 
 // ==========================================================
 
-const String FIRMWARE_VERSION_NO = "1.4.3";
+const String FIRMWARE_VERSION_NO = "1.4.4";
 const String MB_NAME = "TFTSHIELD";
 
 //  EEPROM addresses
@@ -80,11 +80,11 @@ const int  EEPROM_END = 70;
 
 // Pen raising servo
 Servo penHeight;
-const int DEFAULT_DOWN_POSITION = 30;
-const int DEFAULT_UP_POSITION = 120;
+const int DEFAULT_DOWN_POSITION = 50;
+const int DEFAULT_UP_POSITION = 80;
 static int upPosition = DEFAULT_UP_POSITION; // defaults
 static int downPosition = DEFAULT_DOWN_POSITION;
-static int penLiftSpeed = 3; // ms between steps of moving motor
+static int penLiftSpeed = 10; // ms between steps of moving motor
 const byte PEN_HEIGHT_SERVO_PIN = A3; //UNL2003 driver uses pin 9
 
 boolean isPenUp = false;
@@ -99,25 +99,25 @@ static float scaleX = 1.0;
 static float scaleY = 1.0;
 static int rotateTransform = 0;
 
-static int machineWidth = 542;
-static int machineHeight = 750;
+static int machineWidth = 936;
+static int machineHeight = 950;
 static int sqtest = 0;
 
 // Machine specification defaults
-const int defaultMachineWidth = 542;
-const int defaultMachineHeight = 750;
+const int defaultMachineWidth = 936;
+const int defaultMachineHeight = 950;
 const int defaultMmPerRev = 48;       //24 fogú tárcsa * 2mm/fog
 const int defaultStepsPerRev = 200;   //200 lépés/360fok
 const int defaultStepMultiplier = 2;
 
-const float homeA = 1234.0;
-const float homeB = 1234.0;
+const float homeA = 2191.0; //1234
+const float homeB = 2191.0;
 
 static long startLengthStepsA = 1000;
 static long startLengthStepsB = 1000;
 
 String machineName = "";
-const String DEFAULT_MACHINE_NAME = "GP171223";  //maximum 10char
+const String DEFAULT_MACHINE_NAME = "GP180222";  //maximum 10char
 
 static float currentMaxSpeed = 1500.0;
 static float currentAcceleration = 1500.0;
@@ -239,11 +239,11 @@ const static String CMD_G90 = "G90";
 const static String CMD_G99 = "G99";
 
 //GP koordináta átszámolás a GCode generáló programból
-float GXoffs = 355.60;    //X eltolás a GCode-ban középről a bal felső sarok lesz a 0 pont
-float GYoffs = 233.59;    //Y eltolás
-float Gdiv = 0.45;        //nagyítás  (A GCode referencia gép sokkal nagyobb
-float MACH_X_offs = 110;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
-float MACH_Y_offs = 190;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
+float GXoffs = 190;    //X eltolás a GCode-ban középről a bal felső sarok lesz a 0 pont
+float GYoffs = 0;    //Y eltolás
+float Gdiv = 1.0;        //nagyítás  (A GCode referencia gép sokkal nagyobb
+float MACH_X_offs = 280;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
+float MACH_Y_offs = 290;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
 long DrawStartLine = 0;
 
 void setup() 
