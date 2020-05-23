@@ -19,7 +19,7 @@ standard LCD 4x20
 	A4,A5  --> Pin 20,21   (SCL,SDA)
 	11,12,13-->50,51,52 (SPI bus)
 
-2 x PicoDrive Stepper driver modul
+2 x TMC2208 Silent Stepper driver modul
 
 Extended GCODE command set. Drawing directly from SD card or from PC with Sandy Noble's Controller.
 https://github.com/euphy/polargraphcontroller 
