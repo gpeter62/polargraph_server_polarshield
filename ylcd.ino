@@ -298,8 +298,7 @@ void lcd_displayFirstMenu()
   lcd_updateDisplay(true);
 }
 
-void lcd_updateDisplay(boolean ForceRefresh)
-{
+void lcd_updateDisplay(boolean ForceRefresh) {
 static int old_currentMenu,old_currentLine;
 static long oldcounter;  
 
@@ -501,13 +500,11 @@ void SetHomeMotors()
       reportPosition();
 }      
 
-void ReturnHomeMotors()
-{
+void ReturnHomeMotors(){
      changeLength((float)stepMultiplier*homeA,(float)stepMultiplier*homeB);
 }
 
-void PenLiftUpSetup()
-{
+void PenLiftUpSetup(){
   encoderPos = 0;
   long lastcheck;
   boolean exitflag;
@@ -548,8 +545,7 @@ void PenLiftUpSetup()
   }    
 }
 
-void PenLiftDownSetup()
-{
+void PenLiftDownSetup(){
   encoderPos = 0;
   long lastcheck;
   boolean exitflag;
@@ -590,8 +586,7 @@ void PenLiftDownSetup()
   }    
 }
 
-void lcd_processCommand()
-{
+void lcd_processCommand(){
   int oldstepmulti = 0;
   if (pressedButton ==0) return;
   MenuEncPossible = false;
@@ -633,8 +628,7 @@ void lcd_processCommand()
     case BUTTON_SET_MULTIPLIER:
       oldstepmulti = stepMultiplier;
       stepMultiplier = (byte)use_encoder((int)stepMultiplier,1,16,1);
-      if (stepMultiplier != oldstepmulti)
-        { 
+      if (stepMultiplier != oldstepmulti)  { 
         EEPROM_writeAnything(EEPROM_MACHINE_STEP_MULTIPLIER, stepMultiplier);
         eeprom_loadMachineSpecFromEeprom();
         }
@@ -665,6 +659,7 @@ void lcd_processCommand()
         pressedButton = Menu[currentAbsLine].function;
         lcd_updateDisplay(true);
         impl_exec_execFromStore(commandFilename);
+        penlift_penUp();
         ReturnHomeMotors();
       } 
       break;
@@ -740,8 +735,7 @@ void lcd_processCommand()
     MenuEncPossible = true;
 }
 
-void lcd_runStartScript()
-{
+void lcd_runStartScript(){
   impl_engageMotors();
   motorA.setCurrentPosition(startLengthStepsA);
   motorB.setCurrentPosition(startLengthStepsB);  
@@ -755,8 +749,7 @@ void lcd_runEndScript()
   isCalibrated = false;
 }
 
-void lcd_setCurrentMenu(byte menu)
-{
+void lcd_setCurrentMenu(byte menu){
   currentMenu = menu;
 }
 
@@ -809,14 +802,12 @@ void lcd_displayMachineSpec()
   while(true)
   {
   lcd.clear();
-  if (encoderPos == 1)
-  {
+  if (encoderPos == 1)  {
   lcd.print("MachineName:"); lcd.print(machineName);
   lcd.setCursor(0,2); lcd.print("Use ROTARY or <>");
   }
   
-  if (encoderPos == 2)
-  {
+  if (encoderPos == 2)  {
   lcd.print("Machine  Width:"); lcd.print(machineWidth);
   lcd.setCursor(0,1);
   lcd.print("Machine Height:"); lcd.print(machineHeight);
@@ -826,8 +817,7 @@ void lcd_displayMachineSpec()
   lcd.print("StepsPerRev:");  lcd.print(motorStepsPerRev);
   }
   
-  if (encoderPos == 3)
-  {  
+  if (encoderPos == 3)  {  
   lcd.print("MmPerStep :");  lcd.print(mmPerStep);
   lcd.setCursor(0,1);
   lcd.print("StepsPerMM:"); lcd.print(stepsPerMM);
@@ -837,8 +827,7 @@ void lcd_displayMachineSpec()
   lcd.print("HomeA"); lcd.print(homeA); lcd.print("B"); lcd.print(homeB);
   }
   
-  if (encoderPos == 4)
-  {
+  if (encoderPos == 4)  {
   lcd.print("Page  Width:");  lcd.print(pageWidth);
   lcd.setCursor(0,1);
   lcd.print("Page Height:"); lcd.print(pageHeight);
@@ -848,8 +837,7 @@ void lcd_displayMachineSpec()
   lcd.print(autoStartFilename);
   }
   
-  if (encoderPos == 5)
-  {
+  if (encoderPos == 5)  {
   lcd.print("OffsX");   lcd.print(GXoffs);            lcd.print(" Y"); lcd.print(GYoffs);
   lcd.setCursor(0,1);   lcd.print("Gcode divider:");  lcd.print(Gdiv);
   lcd.setCursor(0,2);   lcd.print("MACH_X_offset:");  lcd.print(MACH_X_offs);
@@ -859,18 +847,16 @@ void lcd_displayMachineSpec()
   if (encoderPos == 6)
       lcd_showSummary();
       
-  if (encoderPos == 7)
-  {
+  if (encoderPos == 7)  {
   lcd.print("Original code:");    
   lcd.setCursor(0,1);
   lcd.print("www.polargraph.co.uk");
   lcd.setCursor(0,2);
   lcd.print("MOD by Peter Gautier");
   lcd.setCursor(0,3);
-  lcd.print("        dec 23, 2017");
+  lcd.print("        may 23,2020");
   }
-  while (encoderPos == old_encoderPos)
-     {    
+  while (encoderPos == old_encoderPos)     {    
      if (GetExit()) {while(GetExit()); lcd.clear(); lcd_updateDisplay(true); return;}
      if (GetLeft())  { encoderPos--;  while(GetLeft()); }
      if (GetRight()) { encoderPos++;  while(GetRight()); }
@@ -883,8 +869,7 @@ void lcd_displayMachineSpec()
 
 
 
-void LoadFilenameArray()
-{
+void LoadFilenameArray(){
   
   NoOfFiles = 0; commandFileNo = 0;   commandFilename = "";
   root = SD.open("/", FILE_READ);
@@ -923,12 +908,10 @@ void lcd_echoLastCommandToDisplay(String com, String prefix)
 }
 */
 
-void LCD_Motors()
-{
-  return;
+void LCD_Motors() {
   lcd.setCursor(0,1); lcd.print(cleanline);
   lcd.setCursor(0,1);  lcd.print("A:"); lcd.print(motorA.currentPosition());
-  lcd.setCursor(8,1);   lcd.print("B:"); lcd.print(motorB.currentPosition()); 
+  lcd.setCursor(7,1);  lcd.print("B:"); lcd.print(motorB.currentPosition()); 
 //  lcd.setCursor(0,3);
 //  lcd.print(cleanline);
 //  lcd.setCursor(0,3);

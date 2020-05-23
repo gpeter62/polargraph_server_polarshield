@@ -18,67 +18,66 @@ routines are here.
 */
 /**  This method looks only for the basic command set
 */
-boolean exec_executeBasicCommand(String &com)
-{
+boolean exec_executeBasicCommand(char* com) {
   boolean executed = true;
+  //Serial.print("ExecuteBasic proc:"); Serial.println(com);
   
   commandFileLineCount++;
-  
-  if (com.startsWith(CMD_CHANGELENGTH))
+   if (memcmp(com,CMD_G1,2)==0)  {
+          if (memcmp(inParam1,"Z0",2) == 0)  {inNoOfParams=0; penlift_penUp();}
+          else if (memcmp(inParam1,"Z1",2) == 0)  {inNoOfParams=0; penlift_penDown();}
+          else exec_G1();
+        }  
+  else if (memcmp(com,CMD_CHANGELENGTH,3)==0)
     exec_changeLength();
-  else if (com.startsWith(CMD_CHANGELENGTHDIRECT))
+  else if (memcmp(com,CMD_CHANGELENGTHDIRECT,3)==0)
     exec_changeLengthDirect();
-  else if (com.startsWith(CMD_CHANGEPENWIDTH))
+  else if (memcmp(com,CMD_CHANGEPENWIDTH,3)==0)
     exec_changePenWidth();
-  else if (com.startsWith(CMD_SETMOTORSPEED))
+  else if (memcmp(com,CMD_SETMOTORSPEED,3)==0)
     exec_setMotorSpeed();
-  else if (com.startsWith(CMD_SETMOTORACCEL))
+  else if (memcmp(com,CMD_SETMOTORACCEL,3)==0)
     exec_setMotorAcceleration();
-  else if (com.startsWith(CMD_DRAWPIXEL))
+  else if (memcmp(com,CMD_DRAWPIXEL,3)==0)
     pixel_drawSquarePixel();
-  else if (com.startsWith(CMD_DRAWSCRIBBLEPIXEL))
+  else if (memcmp(com,CMD_DRAWSCRIBBLEPIXEL,3)==0)
     pixel_drawScribblePixel();
-  else if (com.startsWith(CMD_CHANGEDRAWINGDIRECTION))
+  else if (memcmp(com,CMD_CHANGEDRAWINGDIRECTION,3)==0)
     exec_changeDrawingDirection();
-  else if (com.startsWith(CMD_SETPOSITION))
+  else if (memcmp(com,CMD_SETPOSITION,3)==0)
     exec_setPosition();
-  else if (com.startsWith(CMD_TESTPENWIDTHSQUARE))
+  else if (memcmp(com,CMD_TESTPENWIDTHSQUARE,3)==0)
     pixel_testPenWidth();
-  else if (com.startsWith(CMD_PENDOWN))
+  else if (memcmp(com,CMD_PENDOWN,3)==0)
     penlift_penDown();
-  else if (com.startsWith(CMD_PENUP))
+  else if (memcmp(com,CMD_PENUP,3)==0)
     penlift_penUp();
-  else if (com.startsWith(CMD_SETMACHINESIZE))
+  else if (memcmp(com,CMD_SETMACHINESIZE,3)==0)
     exec_setMachineSizeFromCommand();
-  else if (com.startsWith(CMD_SETMACHINENAME))
+  else if (memcmp(com,CMD_SETMACHINENAME,3)==0)
     exec_setMachineNameFromCommand();
-  else if (com.startsWith(CMD_SETMACHINEMMPERREV))
+  else if (memcmp(com,CMD_SETMACHINEMMPERREV,3)==0)
     exec_setMachineMmPerRevFromCommand();
-  else if (com.startsWith(CMD_SETMACHINESTEPSPERREV))
+  else if (memcmp(com,CMD_SETMACHINESTEPSPERREV,3)==0)
     exec_setMachineStepsPerRevFromCommand();
-  else if (com.startsWith(CMD_SETMACHINESTEPMULTIPLIER))
+  else if (memcmp(com,CMD_SETMACHINESTEPMULTIPLIER,3)==0)
     exec_setMachineStepMultiplierFromCommand();
-  else if (com.startsWith(CMD_SETPENLIFTRANGE))
+  else if (memcmp(com,CMD_SETPENLIFTRANGE,3)==0)
     exec_setPenLiftRange();
-  else if (com.startsWith(CMD_GETMACHINEDETAILS))
+  else if (memcmp(com,CMD_GETMACHINEDETAILS,3)==0)
     exec_reportMachineSpec();
-  else if (com.startsWith(CMD_RESETEEPROM))
+  else if (memcmp(com,CMD_RESETEEPROM,3)==0)
     eeprom_resetEeprom();
 // by GP    
-  else if (com.startsWith(CMD_G21))
+  else if (memcmp(com,CMD_G21,3)==0)
     exec_G21();
-  else if (com.startsWith(CMD_G90))
+  else if (memcmp(com,CMD_G90,3)==0)
     exec_G90();      
-  else if (com.startsWith(CMD_G99)) 
-    exec_G99();  
-  else if (com.startsWith(CMD_G1))
-    {
-    if (strcmp(inParam1,"Z0") == 0)  {inNoOfParams=0; penlift_penUp();}
-    else if (strcmp(inParam1,"Z1") == 0)  {inNoOfParams=0; penlift_penDown();}
-    else exec_G1();
-    }    
+  else if (memcmp(com,CMD_G99,3)==0) 
+    Serial.println(com);  
   else
     executed = false;
+    
   LCD_Motors();  //by GP
   return executed;
 }
@@ -164,8 +163,7 @@ void exec_setMachineNameFromCommand()
   String name = inParam1;
   if (name != DEFAULT_MACHINE_NAME)
   {
-    for (int i = 0; i < 8; i++)
-    {
+    for (int i = 0; i < 8; i++)    {
       EEPROM.write(EEPROM_MACHINE_NAME+i, name[i]);
     }
   }
@@ -492,21 +490,19 @@ float desiredSpeed(long distanceTo, float currentSpeed, float acceleration)
 
 
 //GP extensions
-void exec_G99()   //comment line
-{}
+void exec_G99() {Serial.println("Comment line...");}  //comment line
 
-void exec_G21()
-{}
 
-void exec_G90()
-{}
+void exec_G21(){ Serial.println("G21...");}
 
-void exec_G1()    //G1 move relative to the last point
-{
+void exec_G90(){Serial.println("G90...");}
+
+void exec_G1() {   //G1 move relative to the last point
+
       float endA1 = (float)atof(inParam1);
       float endB1 = (float)atof(inParam2);
       float endA2,endB2;
-
+Serial.print("Move: A");   Serial.print(endA1); Serial.print(" B:"); Serial.println(endB1);
 //      lcd.setCursor(0,1);
 //      lcd.print("                    ");
 //      lcd.setCursor(0,1);
@@ -526,6 +522,3 @@ void exec_G1()    //G1 move relative to the last point
       dtostrf(endA2, 6, 2, inParam1);  dtostrf(endB2, 6, 2, inParam2);  dtostrf(2, 6, 2, inParam3);
       exec_changeLengthDirect();
 }
-
-
-

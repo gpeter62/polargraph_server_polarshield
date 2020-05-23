@@ -13,19 +13,18 @@ This has all the methods that let the rest actually work, including
 the geometry routines that convert from the different coordinates
 systems, and do transformations.
 
+
 */
-long multiplier(int in)
-{
+
+long multiplier(int in){
   return multiplier(long(in));
 }
 
-long multiplier(long in)
-{
+long multiplier(long in){
   return in * long(stepMultiplier);
 }
 
-float multiplier(double in)
-{
+float multiplier(double in){
 //  Serial.print("float multiplier in: ");
 //  Serial.println(in);
 //  Serial.print("Step multiplier: ");
@@ -39,13 +38,11 @@ float multiplier(double in)
   return out;
 }
 
-long divider(long in)
-{
+long divider(long in){
   return in / float(stepMultiplier);
 }
 
-void transform(float &tA, float &tB)
-{
+void transform(float &tA, float &tB){
 //  Serial.print("In tA:");
 //  Serial.println(tA);
 //  Serial.print("In tB:");
@@ -355,6 +352,20 @@ long getCartesianY(long cX, float aPos) {
   return calcY;
 }
 
-
-
-
+#ifdef __arm__
+// should use uinstd.h to define sbrk but Due causes a conflict
+extern "C" char* sbrk(int incr);
+#else  // __ARM__
+extern char *__brkval;
+#endif  // __arm__
+ 
+int freeMemory() {
+  char top;
+#ifdef __arm__
+  return &top - reinterpret_cast<char*>(sbrk(0));
+#elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
+  return &top - __brkval;
+#else  // __arm__
+  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+#endif  // __arm__
+}

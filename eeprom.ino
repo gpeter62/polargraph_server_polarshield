@@ -118,8 +118,7 @@ void eeprom_loadMachineName()
 void eeprom_loadStepMultiplier()
 {
   EEPROM_readAnything(EEPROM_MACHINE_STEP_MULTIPLIER, stepMultiplier);
-  if (stepMultiplier < 1)
-  {
+  if (stepMultiplier < 1)  {
     stepMultiplier = defaultStepMultiplier;
   }
   Serial.print(F("Loaded motor step multiplier:"));
@@ -239,4 +238,3 @@ void eeprom_save_factory_defaults()
     EEPROM_writeAnything(EEPROM_MACH_Y_OFFS, MACH_Y_offs);
     EEPROM_writeAnything(EEPROM_FACTORY_RESET, (byte)0);
 }
-

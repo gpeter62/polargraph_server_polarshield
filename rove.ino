@@ -361,23 +361,19 @@ void rove_drawNorwegianFromFile()
         Serial.print(", y:");
         Serial.println(cY);
         
-        if (int(cY) > pbmHeight || int(cX) > pbmWidth)
-        {
+        if (int(cY) > pbmHeight || int(cX) > pbmWidth)   {
           Serial.println("Out of pixels. Cancelling");
           finished = true;
         }
-        else
-        {
+        else  {
           // Get pixel brightness at that position
           byte brightness = sd_getBrightnessAtPixel(cX, cY);
           
-          if (brightness < 0)
-          {
+          if (brightness < 0)   {
             Serial.println("No brightness value found. Cancelling.");
             finished = true;
           }
-          else
-          {
+          else   {
             // Scale pixel amplitude to be in range 0 to <maxAmplitude>,
             // where brightest = 0 and darkest = <maxAmplitude>
             byte amplitude = brightness;
@@ -394,8 +390,7 @@ void rove_drawNorwegianFromFile()
           }
         }
       }
-      else
-      {
+      else  {
         Serial.println("Finished!!");
         // finished
       }
@@ -410,20 +405,17 @@ void rove_drawNorwegianFromFile()
 
 void rove_drawRoveAreaFittedToImage()
 {
-  if (useRoveArea)
-  {
+  if (useRoveArea) {
     // get parameters
     String filename = inParam1;
 
     // Look up file and open it
-    if (!sd_openPbm(filename))
-    {
+    if (!sd_openPbm(filename))    {
       Serial.print("Couldn't open that file - ");
       Serial.println(filename);
       return;
     }
-    else
-    {
+    else   {
       Serial.print("image size "); 
       Serial.print(pbmWidth, DEC);
       Serial.print(", ");
@@ -530,8 +522,7 @@ void rove_drawRoveAreaFittedToImage()
 //    Serial.println("Done.");
     
   }
-  else
-  {
+  else  {
     Serial.println("Rove area must be chosen for this operation.");
   }
 }
@@ -550,8 +541,7 @@ void  rove_moveToRandomPositionInRoveArea()
   changeLength(a,b);
 }
 
-void rove_swirl()
-{
+void rove_swirl() {
   motorA.run();
   motorB.run();
   
@@ -590,6 +580,3 @@ void rove_controlSwirling()
     }
   }
 }
-
-
-

@@ -15,13 +15,12 @@ mega/polarshield version of the polargraph.
 
 /*  Implementation of executeCommand for MEGA-sized boards that
 have command storage features. */
-void impl_processCommand(String com)
-{
+void impl_processCommand(char* com){
 //  lcd_echoLastCommandToDisplay(com, "usb:");
   
   // check for change mode commands
-  if (com.startsWith(CMD_MODE_STORE_COMMANDS)
-  || com.startsWith(CMD_MODE_LIVE))
+  if ((memcmp(com,CMD_MODE_STORE_COMMANDS,3)==0)
+  || (memcmp(com,CMD_MODE_LIVE,3)==0))
   {
     Serial.println("Changing mode.");
     impl_executeCommand(com);
@@ -46,50 +45,50 @@ void impl_processCommand(String com)
 *  it's own decision tree to try and run one of the additional
 *  routines.
 */
-void impl_executeCommand(String &com)
-{
-  if (exec_executeBasicCommand(com))
-  {
-    // that's nice, it worked
+void impl_executeCommand(char* com) {
+  //Serial.print("Execute process:"); Serial.println(com);
+  //Serial.print("Free mem:"); Serial.println(freeMemory());
+  
+  if (exec_executeBasicCommand(com))  { // that's nice, it worked
     //Serial.println("Executed basic.");
   }
-  else if (com.startsWith(CMD_DRAWCIRCLEPIXEL))
+  else if (memcmp(com,CMD_DRAWCIRCLEPIXEL,3)==0)
     curves_pixel_drawCircularPixel();
-//  else if (com.startsWith(CMD_TESTPATTERN))
+//  else if (memcmp(com,CMD_TESTPATTERN,3)==0)
 //    testPattern();
-  else if (com.startsWith(CMD_TESTPENWIDTHSCRIBBLE))
+  else if (memcmp(com,CMD_TESTPENWIDTHSCRIBBLE,3)==0)
     impl_pixel_testPenWidthScribble();
-  else if (com.startsWith(CMD_DRAWSAWPIXEL))
+  else if (memcmp(com,CMD_DRAWSAWPIXEL,3)==0)
     impl_pixel_drawSawtoothPixel();
-  else if (com.startsWith(CMD_DRAWDIRECTIONTEST))
+  else if (memcmp(com,CMD_DRAWDIRECTIONTEST,3)==0)
     impl_exec_drawTestDirectionSquare();
-  else if (com.startsWith(CMD_MODE_STORE_COMMANDS))
+  else if (memcmp(com,CMD_MODE_STORE_COMMANDS,3)==0)
     impl_exec_changeToStoreCommandMode();
-  else if (com.startsWith(CMD_MODE_LIVE))
+  else if (memcmp(com,CMD_MODE_LIVE,3)==0)
     impl_exec_changeToLiveCommandMode();
-  else if (com.startsWith(CMD_MODE_EXEC_FROM_STORE))
+  else if (memcmp(com,CMD_MODE_EXEC_FROM_STORE,3)==0)
     impl_exec_execFromStore();
-  else if (com.startsWith(CMD_RANDOM_DRAW))
+  else if (memcmp(com,CMD_RANDOM_DRAW,3)==0)
     drawRandom();
-  else if (com.startsWith(CMD_SET_ROVE_AREA))
+  else if (memcmp(com,CMD_SET_ROVE_AREA,3)==0)
     rove_setRoveArea();
-  else if (com.startsWith(CMD_START_TEXT))
+  else if (memcmp(com,CMD_START_TEXT,3)==0)
     rove_startText();
-  else if (com.startsWith(CMD_DRAW_SPRITE))
+  else if (memcmp(com,CMD_DRAW_SPRITE,3)==0)
     sprite_drawSprite();
-  else if (com.startsWith(CMD_DRAW_RANDOM_SPRITE))
+  else if (memcmp(com,CMD_DRAW_RANDOM_SPRITE,3)==0)
     sprite_drawRandomPositionedSprite();
-  else if (com.startsWith(CMD_CHANGELENGTH_RELATIVE))
+  else if (memcmp(com,CMD_CHANGELENGTH_RELATIVE,3)==0)
     exec_changeLength();
-  else if (com.startsWith(CMD_SWIRLING))
+  else if (memcmp(com,CMD_SWIRLING,3)==0)
     rove_controlSwirling();
-  else if (com.startsWith(CMD_DRAW_NORWEGIAN))
+  else if (memcmp(com,CMD_DRAW_NORWEGIAN,3)==0)
     rove_drawNorwegianFromFile();
-  else if (com.startsWith(CMD_DRAW_NORWEGIAN_OUTLINE))
+  else if (memcmp(com,CMD_DRAW_NORWEGIAN_OUTLINE,3)==0)
     rove_drawRoveAreaFittedToImage();
-  else if (com.startsWith(CMD_AUTO_CALIBRATE))
+  else if (memcmp(com,CMD_AUTO_CALIBRATE,3)==0)
     calibrate_doCalibration();
-  else if (com.startsWith(CMD_SET_DEBUGCOMMS))
+  else if (memcmp(com,CMD_SET_DEBUGCOMMS,3)==0)
     impl_setDebugComms();
   else
   {
@@ -121,15 +120,12 @@ void impl_runBackgroundProcesses()
     rove_swirl();
 }
 
-void impl_loadMachineSpecFromEeprom()
-{
+void impl_loadMachineSpecFromEeprom(){
 }
 
-void impl_exec_execFromStore()
-{
+void impl_exec_execFromStore(){
   String fileToExec = inParam1;
-  if (fileToExec != "")
-  {
+  if (fileToExec != "")  {
     currentlyDrawingFromFile = true;
     Serial.print("Filename to read from: ");
     Serial.println(fileToExec);
@@ -137,21 +133,19 @@ void impl_exec_execFromStore()
     impl_exec_execFromStore(commandFilename);
     currentlyDrawingFromFile = true;
   }
-  else
-  {
-    Serial.println("No filename supplied to read from.");
-  }
+  else  {  Serial.println("No filename supplied to read from.");  }
   
 }
 
-void impl_exec_execFromStore(String inFilename)
-{
-  if (inFilename != "")
-  {
+void impl_exec_execFromStore(String inFilename){
+  char command[100];
+  int comptr =0;
+  boolean commandParsed = false;
+            
+  if (inFilename != "")  {
     String noBlanks = "";
     // remove blanks
-    for (int i = 0; i<inFilename.length(); i++)
-    {
+    for (int i = 0; i<inFilename.length(); i++)    {
       if (inFilename[i] != ' ')
         noBlanks = noBlanks + inFilename[i];
     }
@@ -163,60 +157,62 @@ void impl_exec_execFromStore(String inFilename)
     Serial.println(filename);
 #endif
     File readFile = SD.open(filename, FILE_READ);
-    if (readFile)
-    {
+    if (readFile)  {
       Serial.print("Opened file:");
       Serial.println(noBlanks);
-      String command = "";
-      while (readFile.available() && currentlyDrawingFromFile)
-      {
+     command[0]=0; comptr = 0;
+      while (readFile.available() && currentlyDrawingFromFile)   {
 #ifdef DEBUG_SD        
         Serial.println("Reading...");
         // poll for input
 #endif
         char ch = readFile.read();
 #ifdef DEBUG_SD        
-        Serial.print(".");
-        Serial.print(ch);
-        Serial.print("-");
+        Serial.print(".");   Serial.print(ch);   Serial.print("-");
 #endif
-        if (ch == INTERMINATOR || ch == SEMICOLON)
-        {
+        if (ch == INTERMINATOR || ch == SEMICOLON)   {
 #ifdef DEBUG_SD        
           Serial.println("New line");
 #endif
           // execute the line
-          command.trim();
-          command.toCharArray(lastCommand, INLENGTH+1);
-          boolean commandParsed = comms_parseCommand(lastCommand);
-          if (commandParsed)
-          {
+          command[comptr] = 0;  //terminating 0
+          if (memcmp(command,CMD_G99,3)==0) {
+            Serial.print("Comment:"); Serial.println(command);    //Comment - only to print!!!
+          }
+          else {   //valid command, parse and execute...
+            strncpy(lastCommand,command,min(strlen(command),sizeof(lastCommand)));
+            commandParsed = comms_parseCommand(lastCommand);
+           if (commandParsed)  {
 #ifdef DEBUG_SD        
             Serial.println("Stored command parsed.");
 #endif
-            Serial.print(F("Executing command:"));
-            Serial.println(command);
 //            if (echoingStoredCommands) lcd_echoLastCommandToDisplay(command, inFilename+": ");
-            impl_executeCommand(command);
-          }
+            impl_executeCommand(lastCommand);   
+          } //endif commandparsed
 #ifdef DEBUG_SD        
-          else Serial.println("Stored command WAS NOT parsed.");
-#endif            
-          command = "";
+          else 
+          Serial.println("Stored command WAS NOT parsed.");
+#endif        
+          }  //endelse valid command  
+          command[0] = 0;   //clear buffer
+          comptr=0;
           lcd_checkForInput();
+        }  //endif  terminated
+        else {
+          command[comptr]= ch; 
+          comptr++; 
+          if (comptr>=sizeof(command)) comptr=0;  //buffer overflow???
+          command[comptr]=0;
         }
-        else
-          command += ch;
-
 #ifdef DEBUG_SD        
         Serial.print("Command building:");
         Serial.println(command);
 #endif
-      }
+      } //end while 
       Serial.println("Finished with the file.");
       currentlyDrawingFromFile = false;
       readFile.close();
-    }
+    }  //endif readfile()
     else
     {
       Serial.println("Couldn't find that file, btw.");
@@ -231,12 +227,10 @@ void impl_exec_execFromStore(String inFilename)
   
 }
 
-void impl_exec_changeToStoreCommandMode()
-{
+void impl_exec_changeToStoreCommandMode(){
   String newfilename = inParam1;
   String newFile = inParam2;
-  if (newfilename != "")
-  {
+  if (newfilename != "")  {
     Serial.print("Filename for command store: ");
     Serial.println(newfilename);
     storeCommands = true;
@@ -264,14 +258,12 @@ void impl_exec_changeToStoreCommandMode()
   }
 }
 
-void impl_exec_changeToLiveCommandMode()
-{
+void impl_exec_changeToLiveCommandMode(){
   Serial.println(F("Changing back to live mode."));
   storeCommands = false;
 }
 
-void impl_pixel_testPenWidthScribble()
-{
+void impl_pixel_testPenWidthScribble(){
   int rowWidth = multiplier(atoi(inParam1));
   float startWidth = atof(inParam2);
   float endWidth = atof(inParam3); 
@@ -354,14 +346,12 @@ void drawRandom()
   {
     Serial.print("Drawing:");
     Serial.println(i);
-    while (motorA.distanceToGo() != 0 && motorB.distanceToGo() != 0)
-    {
+    while (motorA.distanceToGo() != 0 && motorB.distanceToGo() != 0)   {
       motorA.run();
       motorB.run();
     }
 
-    if (motorA.distanceToGo() == 0)
-    {
+    if (motorA.distanceToGo() == 0)   {
       int r = random(-2,3);
       motorA.move(r);
 
@@ -369,8 +359,7 @@ void drawRandom()
       Serial.println(r);
     }
 
-    if (motorB.distanceToGo() == 0)
-    {
+    if (motorB.distanceToGo() == 0)   {
       int r = random(-2,3);
       motorB.move(r);
       Serial.print("Chosen new B target: ");
@@ -381,8 +370,7 @@ void drawRandom()
   }
 }
 
-void impl_exec_drawTestDirectionSquare()
-{
+void impl_exec_drawTestDirectionSquare(){
   int rowWidth = multiplier(atoi(inParam1));
   int segments = atoi(inParam2);
   pixel_drawSquarePixel(rowWidth, rowWidth, segments, DIR_SE);
@@ -475,4 +463,3 @@ void impl_setDebugComms() {
     case 1: debugComms = true; break;
   }
 }
-

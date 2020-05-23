@@ -17,7 +17,7 @@ Modified for MEGA pinout!!!
 UNO  ----> MEGA
 A4,A5  --> Pin 20,21   (SCL,SDA)
 11,12,13-->50,51,52 (SPI bus)
-2 x PicoDrive Stepper driver modul
+2 x TMC2080 stepper driver
 
 Extended command set: G1,G21,G90
 Offset and size% in case of external GCode source
@@ -31,17 +31,16 @@ Offset and size% in case of external GCode source
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-#define SERIAL_STEPPER_DRIVERS 
-
 
 // 4.  Turn on some debugging code if you want horror
 // =================================================
 #define DEBUG
-#define DEBUG_COMMS
+//#define DEBUG_COMMS
+//#define DEBUG_SD
 //#define DEBUG_PENLIFT
 //#define DEBUG_PIXEL
 
-boolean debugComms = false;
+boolean debugComms = true;
 
 /*  ===========================================================  
     These variables are common to all polargraph server builds
@@ -49,8 +48,8 @@ boolean debugComms = false;
 
 // ==========================================================
 
-const String FIRMWARE_VERSION_NO = "1.4.4";
-const String MB_NAME = "TFTSHIELD";
+const char FIRMWARE_VERSION_NO[] = "1.5.0";
+const char MB_NAME[] = "TFTSHIELD";
 
 //  EEPROM addresses
 const int EEPROM_MACHINE_WIDTH = 0;
@@ -91,7 +90,7 @@ boolean isPenUp = false;
 
 static int motorStepsPerRev = 200;  //200 lépés/360fok
 static float mmPerRev = 48;         //24 fogú tárcsa * 2mm/fog
-static byte stepMultiplier = 2;
+static int stepMultiplier = 2;
 
 static float translateX = 0.0;
 static float translateY = 0.0;
@@ -110,7 +109,7 @@ const int defaultMmPerRev = 48;       //24 fogú tárcsa * 2mm/fog
 const int defaultStepsPerRev = 200;   //200 lépés/360fok
 const int defaultStepMultiplier = 2;
 
-const float homeA = 2191.0; //1234
+const float homeA = 2191.0;   //in steps
 const float homeB = 2191.0;
 
 static long startLengthStepsA = 1000;
@@ -154,7 +153,7 @@ static char inParam4[14];
 
 static byte inNoOfParams;
 
-char lastCommand[INLENGTH+1];
+char lastCommand[INLENGTH+2];
 boolean commandConfirmed = false;
 
 int rebroadcastReadyInterval = 5000L;
@@ -185,11 +184,11 @@ const static byte DIR_MODE_RANDOM = 3;
 static int globalDrawDirectionMode = DIR_MODE_AUTO;
 
 
-const String READY_STR = "READY_200";
-const String RESEND_STR = "RESEND";
-const String DRAWING_STR = "DRAWING";
-const static String OUT_CMD_CARTESIAN_STR = "CARTESIAN,";
-const static String OUT_CMD_SYNC_STR = "SYNC,";
+const char READY_STR[] = "READY_200";
+const char RESEND_STR[] = "RESEND";
+const char DRAWING_STR[] = "DRAWING";
+const char OUT_CMD_CARTESIAN_STR[] = "CARTESIAN,";
+const char OUT_CMD_SYNC_STR[] = "SYNC,";
 
 char MSG_E_STR[] = "MSG,E,";
 char MSG_I_STR[] = "MSG,I,";
@@ -204,39 +203,39 @@ static const byte SAW_SHAPE = 1;
 
 const static char COMMA[] = ",";
 const static char CMD_END[] = ",END";
-const static String CMD_CHANGELENGTH = "C01";
-const static String CMD_CHANGEPENWIDTH = "C02";
-const static String CMD_CHANGEMOTORSPEED = "C03";
-const static String CMD_CHANGEMOTORACCEL = "C04";
-const static String CMD_DRAWPIXEL = "C05";
-const static String CMD_DRAWSCRIBBLEPIXEL = "C06";
-const static String CMD_CHANGEDRAWINGDIRECTION = "C08";
-const static String CMD_SETPOSITION = "C09";
-const static String CMD_TESTPATTERN = "C10";
-const static String CMD_TESTPENWIDTHSQUARE = "C11";
-const static String CMD_PENDOWN = "C13";
-const static String CMD_PENUP = "C14";
-const static String CMD_CHANGELENGTHDIRECT = "C17";
-const static String CMD_SETMACHINESIZE = "C24";
-const static String CMD_SETMACHINENAME = "C25";
-const static String CMD_GETMACHINEDETAILS = "C26";
-const static String CMD_RESETEEPROM = "C27";
-const static String CMD_SETMACHINEMMPERREV = "C29";
-const static String CMD_SETMACHINESTEPSPERREV = "C30";
-const static String CMD_SETMOTORSPEED = "C31";
-const static String CMD_SETMOTORACCEL = "C32";
-const static String CMD_SETMACHINESTEPMULTIPLIER = "C37";
-const static String CMD_SETPENLIFTRANGE = "C45";
-const static String CMD_PIXELDIAGNOSTIC = "C46";
-const static String CMD_SET_DEBUGCOMMS = "C47";
+const char CMD_CHANGELENGTH[] = "C01";
+const char CMD_CHANGEPENWIDTH[] = "C02";
+const char CMD_CHANGEMOTORSPEED[] = "C03";
+const char CMD_CHANGEMOTORACCEL[] = "C04";
+const char CMD_DRAWPIXEL[] = "C05";
+const char CMD_DRAWSCRIBBLEPIXEL[] = "C06";
+const char CMD_CHANGEDRAWINGDIRECTION[] = "C08";
+const char CMD_SETPOSITION[] = "C09";
+const char CMD_TESTPATTERN[] = "C10";
+const char CMD_TESTPENWIDTHSQUARE[] = "C11";
+const char CMD_PENDOWN[] = "C13";
+const char CMD_PENUP[] = "C14";
+const char CMD_CHANGELENGTHDIRECT[] = "C17";
+const char CMD_SETMACHINESIZE[] = "C24";
+const char CMD_SETMACHINENAME[] = "C25";
+const char CMD_GETMACHINEDETAILS[] = "C26";
+const char CMD_RESETEEPROM[] = "C27";
+const char CMD_SETMACHINEMMPERREV[] = "C29";
+const char CMD_SETMACHINESTEPSPERREV[] = "C30";
+const char CMD_SETMOTORSPEED[] = "C31";
+const char CMD_SETMOTORACCEL[] = "C32";
+const char CMD_SETMACHINESTEPMULTIPLIER[] = "C37";
+const char CMD_SETPENLIFTRANGE[] = "C45";
+const char CMD_PIXELDIAGNOSTIC[] = "C46";
+const char CMD_SET_DEBUGCOMMS[] = "C47";
 
 
 //GP kiegészítés
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);     //LCD pins from 4>9
-const static String CMD_G1 = "G1";
-const static String CMD_G21 = "G21";
-const static String CMD_G90 = "G90";
-const static String CMD_G99 = "G99";
+const char CMD_G1[] = "G1";
+const char CMD_G21[] = "G21";
+const char CMD_G90[] = "G90";
+const char CMD_G99[] = "G99";
 
 //GP koordináta átszámolás a GCode generáló programból
 float GXoffs = 190;    //X eltolás a GCode-ban középről a bal felső sarok lesz a 0 pont
@@ -246,87 +245,25 @@ float MACH_X_offs = 280;  //a konkrét gépnél itt van a papír bal felső sark
 float MACH_Y_offs = 290;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
 long DrawStartLine = 0;
 
-void setup() 
-{
-  machineName = DEFAULT_MACHINE_NAME;
-  byte factory_reset = 0;
-  Serial.begin(57600);           // set up Serial library at 57600 bps
-  Serial.println("POLARGRAPH ON!");
-  Serial.print(F("v"));
-  Serial.println(FIRMWARE_VERSION_NO);
-  Serial.print(F("Hardware: "));
-  Serial.println(MB_NAME);
-  Serial.print(F("Servo "));
-  Serial.println(PEN_HEIGHT_SERVO_PIN);
-
-   lcd.begin(20,4);
-
-   mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
-   stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;
-   
-   EEPROM_readAnything(EEPROM_FACTORY_RESET, factory_reset);
-   if (factory_reset==66)
-         eeprom_save_factory_defaults();
-         
-  configuration_motorSetup();    
-  eeprom_loadMachineSpecFromEeprom();
-  configuration_setup();
-
-  motorA.setMaxSpeed(currentMaxSpeed);
-  motorA.setAcceleration(currentAcceleration);  
-  motorB.setMaxSpeed(currentMaxSpeed);
-  motorB.setAcceleration(currentAcceleration);
-
-  motorA.setCurrentPosition(startLengthStepsA);
-  motorB.setCurrentPosition(startLengthStepsB);
-
-  for (int i = 0; i<INLENGTH; i++) {
-    lastCommand[i] = 0;
-  }    
-  comms_ready();
-  
-  pinMode(PEN_HEIGHT_SERVO_PIN, OUTPUT);
-  delay(500);
-  penlift_penUp();
-  SetHomeMotors();
-  InitKeyboard();
-//eeprom_resetEeprom();
-//TestKeyboard();
-//TestRotary();
-  sd_autorunSD();
-}
-
-void loop()
-{
-  if (comms_waitForNextCommand(lastCommand)) 
-  {
-#ifdef DEBUG_COMMS    
-    Serial.print(F("Last comm: "));
-    Serial.print(lastCommand);
-    Serial.println(F("..."));
-#endif
-    comms_parseAndExecuteCommand(lastCommand);
-  }
-}
 
 
-const static String CMD_TESTPENWIDTHSCRIBBLE = "C12";
-const static String CMD_DRAWSAWPIXEL = "C15,";
-const static String CMD_DRAWCIRCLEPIXEL = "C16";
-const static String CMD_SET_ROVE_AREA = "C21";
-const static String CMD_DRAWDIRECTIONTEST = "C28";
-const static String CMD_MODE_STORE_COMMANDS = "C33";
-const static String CMD_MODE_EXEC_FROM_STORE = "C34";
-const static String CMD_MODE_LIVE = "C35";
-const static String CMD_RANDOM_DRAW = "C36";
-const static String CMD_START_TEXT = "C38";
-const static String CMD_DRAW_SPRITE = "C39";
-const static String CMD_CHANGELENGTH_RELATIVE = "C40";
-const static String CMD_SWIRLING = "C41";
-const static String CMD_DRAW_RANDOM_SPRITE = "C42";
-const static String CMD_DRAW_NORWEGIAN = "C43";
-const static String CMD_DRAW_NORWEGIAN_OUTLINE = "C44";
-const static String CMD_AUTO_CALIBRATE = "C48";
+const char CMD_TESTPENWIDTHSCRIBBLE[] = "C12";
+const char CMD_DRAWSAWPIXEL[] = "C15,";
+const char CMD_DRAWCIRCLEPIXEL[] = "C16";
+const char CMD_SET_ROVE_AREA[] = "C21";
+const char CMD_DRAWDIRECTIONTEST[] = "C28";
+const char CMD_MODE_STORE_COMMANDS[] = "C33";
+const char CMD_MODE_EXEC_FROM_STORE[] = "C34";
+const char CMD_MODE_LIVE[] = "C35";
+const char CMD_RANDOM_DRAW[] = "C36";
+const char CMD_START_TEXT[] = "C38";
+const char CMD_DRAW_SPRITE[] = "C39";
+const char CMD_CHANGELENGTH_RELATIVE[] = "C40";
+const char CMD_SWIRLING[] = "C41";
+const char CMD_DRAW_RANDOM_SPRITE[] = "C42";
+const char CMD_DRAW_NORWEGIAN[] = "C43";
+const char CMD_DRAW_NORWEGIAN_OUTLINE[] = "C44";
+const char CMD_AUTO_CALIBRATE[] = "C48";
 
 /*  End stop pin definitions  */
 const int ENDSTOP_X_MAX = 40;
@@ -374,7 +311,7 @@ boolean sdCardInit = false;
 File root;
 boolean cardPresent = false;
 boolean cardInit = false;
-boolean echoingStoredCommands = true;
+boolean echoingStoredCommands = false;
 
 // the file itself
 File pbmFile;
@@ -402,3 +339,71 @@ boolean useAutoStartFromSD = true;
 String autoStartFilename = "AUTORUN.TXT";
 boolean autoStartFileFound = false;
 
+void setup() {
+  machineName = DEFAULT_MACHINE_NAME;
+  byte factory_reset = 0;
+  Serial.begin(57600);           // set up Serial library at 57600 bps
+  Serial.println("POLARGRAPH ON!");
+  Serial.print(F("v"));
+  Serial.println(FIRMWARE_VERSION_NO);
+  Serial.print(F("Hardware: "));
+  Serial.println(MB_NAME);
+  Serial.print(F("Servo "));
+  Serial.println(PEN_HEIGHT_SERVO_PIN);
+
+   lcd.begin(20,4);
+
+   mmPerStep = mmPerRev / multiplier(motorStepsPerRev);
+   stepsPerMM = multiplier(motorStepsPerRev) / mmPerRev;
+   
+   EEPROM_readAnything(EEPROM_FACTORY_RESET, factory_reset);
+   if (factory_reset==66)
+         eeprom_save_factory_defaults();
+         
+  configuration_motorSetup();    
+  eeprom_loadMachineSpecFromEeprom();
+  configuration_setup();
+
+  motorA.setMaxSpeed(currentMaxSpeed);
+  motorA.setAcceleration(currentAcceleration);  
+  motorB.setMaxSpeed(currentMaxSpeed);
+  motorB.setAcceleration(currentAcceleration);
+
+  motorA.setCurrentPosition(startLengthStepsA);
+  motorB.setCurrentPosition(startLengthStepsB);
+
+  memset(lastCommand,0,sizeof(lastCommand));
+  
+  comms_ready();
+  
+  pinMode(PEN_HEIGHT_SERVO_PIN, OUTPUT);
+  delay(500);
+  penlift_penUp();
+  SetHomeMotors();
+  InitKeyboard();
+//eeprom_resetEeprom();
+//TestKeyboard();
+//TestRotary();
+  currentlyDrawingFromFile = false;
+  sd_autorunSD();
+  if (!currentlyDrawingFromFile) {
+      sd_simpleInit();
+      if (cardInit) 
+        { LoadFilenameArray();  }
+      else
+        commandFilename = "";
+  }         
+}
+
+void loop(){
+  if (comms_waitForNextCommand(lastCommand))  {
+#ifdef DEBUG_COMMS    
+    Serial.print(F("Last command: "));
+    Serial.print(lastCommand);
+    Serial.println(F("..."));
+#endif
+    comms_parseAndExecuteCommand(lastCommand);
+  }
+}
+
+//--------------------------------------------------------------------------
