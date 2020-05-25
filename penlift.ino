@@ -49,39 +49,31 @@ void penlift_movePen(int start, int end, int delay_ms)
   penHeight.detach();
 }
 
-void penlift_penUp()
-{
-  if (inNoOfParams > 1)
-  {
+void penlift_penUp(){
+  if (inNoOfParams > 1)  {
     //Serial.print("Penup with params");
     int positionToMoveFrom = isPenUp ? upPosition : downPosition;
     upPosition = atoi(inParam1);
     penlift_movePen(positionToMoveFrom, upPosition, penLiftSpeed);
   }
-  else
-  {
-    if (isPenUp == false)
-    {
+  else  {
+    if (isPenUp == false)    {
       penlift_movePen(downPosition, upPosition, penLiftSpeed);
     }
   }
   isPenUp = true;
 }
 
-void penlift_penDown()
-{
+void penlift_penDown(){
   // check to see if this is a multi-action command (if there's a
   // parameter then this sets the "down" motor position too).
-  if (inNoOfParams > 1)
-  {
+  if (inNoOfParams > 1)  {
     int positionToMoveFrom = isPenUp ? upPosition : downPosition;
     downPosition = atoi(inParam1);
     penlift_movePen(positionToMoveFrom, downPosition, penLiftSpeed);
   }
-  else
-  {
-    if (isPenUp == true)
-    {
+  else  {
+    if (isPenUp == true)  {
       penlift_movePen(upPosition, downPosition, penLiftSpeed);
     }
   }
