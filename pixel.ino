@@ -15,8 +15,7 @@ the squarewave and scribble pixel styles.
 */
 
 
-void pixel_drawSquarePixel() 
-{
+void pixel_drawSquarePixel() {
     if (pixelDebug) { Serial.println("In square pixel 1."); }
     long originA = multiplier(atol(inParam1));
     long originB = multiplier(atol(inParam2));
@@ -37,8 +36,7 @@ void pixel_drawSquarePixel()
       globalDrawDirection = pixel_getAutoDrawDirection(originA, originB, motorA.currentPosition(), motorB.currentPosition());
       
 
-    if (globalDrawDirection == DIR_SE) 
-    {
+    if (globalDrawDirection == DIR_SE)     {
       if (pixelDebug) { Serial.println(F("d: SE")); }
       startPointA = originA - halfSize;
       startPointA += offsetStart;
@@ -46,8 +44,7 @@ void pixel_drawSquarePixel()
       endPointA = originA + halfSize;
       endPointB = originB;
     }
-    else if (globalDrawDirection == DIR_SW)
-    {
+    else if (globalDrawDirection == DIR_SW)    {
       if (pixelDebug) { Serial.println(F("d: SW")); }
       startPointA = originA;
       startPointB = originB - halfSize;
@@ -55,8 +52,7 @@ void pixel_drawSquarePixel()
       endPointA = originA;
       endPointB = originB + halfSize;
     }
-    else if (globalDrawDirection == DIR_NW)
-    {
+    else if (globalDrawDirection == DIR_NW)    {
       if (pixelDebug) { Serial.println(F("d: NW")); }
       startPointA = originA + halfSize;
       startPointA -= offsetStart;
@@ -64,7 +60,7 @@ void pixel_drawSquarePixel()
       endPointA = originA - halfSize;
       endPointB = originB;
     }
-    else //(drawDirection == DIR_NE)
+    else //(drawDirection == DIR_NE)    
     {
       if (pixelDebug) { Serial.println(F("d: NE")); }
       startPointA = originA;
@@ -97,20 +93,17 @@ void pixel_drawSquarePixel()
     }
     
     changeLength(startPointA, startPointB);
-    if (noOfWaves > 1)
-    {
+    if (noOfWaves > 1)    {
       pixel_drawWavePixel(size, size, noOfWaves, globalDrawDirection, SQUARE_SHAPE);
     }
     changeLength(endPointA, endPointB);
 }
 
-byte pixel_getRandomDrawDirection()
-{
+byte pixel_getRandomDrawDirection(){
   return random(1, 5);
 }
 
-byte pixel_getAutoDrawDirection(long targetA, long targetB, long sourceA, long sourceB)
-{
+byte pixel_getAutoDrawDirection(long targetA, long targetB, long sourceA, long sourceB){
   byte dir = DIR_SE;
   
   // some bitchin triangles, I goshed-well love triangles.
@@ -135,56 +128,46 @@ byte pixel_getAutoDrawDirection(long targetA, long targetB, long sourceA, long s
       Serial.println(F("."));
   }
   
-  if (targetA<sourceA && targetB<sourceA)
-  {
+  if (targetA<sourceA && targetB<sourceA)  {
     if (pixelDebug) { Serial.println(F("calculated NW")); }
     dir = DIR_NW;
   }
-  else if (targetA>sourceA && targetB>sourceB)
-  {
+  else if (targetA>sourceA && targetB>sourceB)  {
     if (pixelDebug) { Serial.println(F("calculated SE")); }
     dir = DIR_SE;
   }
-  else if (targetA<sourceA && targetB>sourceB)
-  {
+  else if (targetA<sourceA && targetB>sourceB)  {
     if (pixelDebug) { Serial.println(F("calculated SW")); }
     dir = DIR_SW;
   }
-  else if (targetA>sourceA && targetB<sourceB)
-  {
+  else if (targetA>sourceA && targetB<sourceB)  {
     if (pixelDebug) { Serial.println(F("calculated NE")); }
     dir = DIR_NE;
   }
-  else if (targetA==sourceA && targetB<sourceB)
-  {
+  else if (targetA==sourceA && targetB<sourceB)  {
     if (pixelDebug) { Serial.println(F("calc NE")); }
     dir = DIR_NE;
   }
-  else if (targetA==sourceA && targetB>sourceB)
-  {
+  else if (targetA==sourceA && targetB>sourceB)  {
     if (pixelDebug) { Serial.println(F("calc SW")); }
     dir = DIR_SW;
   }
-  else if (targetA<sourceA && targetB==sourceB)
-  {
+  else if (targetA<sourceA && targetB==sourceB)  {
     if (pixelDebug) { Serial.println(F("calc NW")); }
     dir = DIR_NW;
   }
-  else if (targetA>sourceA && targetB==sourceB)
-  {
+  else if (targetA>sourceA && targetB==sourceB)  {
     if (pixelDebug) { Serial.println(F("calc SE")); }
     dir = DIR_SE;
   }
-  else
-  {
+  else  {
     if (pixelDebug) { Serial.println("Not calculated - default SE"); }
   }
 
   return dir;
 }
 
-void pixel_drawScribblePixel() 
-{
+void pixel_drawScribblePixel() {
     long originA = multiplier(atol(inParam1));
     long originB = multiplier(atol(inParam2));
     int size = multiplier(atoi(inParam3));
@@ -197,8 +180,7 @@ void pixel_drawScribblePixel()
     
 }
 
-void pixel_drawScribblePixel(long originA, long originB, int size, int density) 
-{
+void pixel_drawScribblePixel(long originA, long originB, int size, int density) {
   if (pixelDebug) { 
     int originA = motorA.currentPosition();
     int originB = motorB.currentPosition();
@@ -214,8 +196,7 @@ void pixel_drawScribblePixel(long originA, long originB, int size, int density)
   int inc = 0;
   int currSize = size;
   
-  for (int i = 0; i <= density; i++)
-  {
+  for (int i = 0; i <= density; i++)  {
     randA = random(0, currSize);
     randB = random(0, currSize);
     changeLength(lowLimitA+randA, lowLimitB+randB);
@@ -226,8 +207,7 @@ void pixel_drawScribblePixel(long originA, long originB, int size, int density)
   }
 }
 
-int pixel_minSegmentSizeForPen(float penSize)
-{
+int pixel_minSegmentSizeForPen(float penSize){
   float penSizeInSteps = penSize * stepsPerMM;
 
   int minSegSize = 1;
@@ -246,8 +226,7 @@ int pixel_minSegmentSizeForPen(float penSize)
   return minSegSize;
 }
 
-int pixel_maxDensity(float penSize, int rowSize)
-{
+int pixel_maxDensity(float penSize, int rowSize){
   float rowSizeInMM = mmPerStep * rowSize;
 
   if (pixelDebug) {
@@ -265,8 +244,7 @@ int pixel_maxDensity(float penSize, int rowSize)
   if (numberOfSegments >= 2.0)
     maxDens = int(numberOfSegments);
 
-  if (maxDens <= 1)
-  {
+  if (maxDens <= 1)  {
     Serial.print(MSG_I_STR);
     Serial.print(F("Max waves for penSize: "));
     Serial.print(penSize);
@@ -281,8 +259,7 @@ int pixel_maxDensity(float penSize, int rowSize)
   return maxDens;
 }
 
-int pixel_scaleDensity(int inDens, int inMax, int outMax)
-{
+int pixel_scaleDensity(int inDens, int inMax, int outMax) {
   float reducedDens = (float(inDens) / float(inMax)) * float(outMax);
   reducedDens = outMax-reducedDens;
   if (pixelDebug) {     
@@ -305,8 +282,7 @@ int pixel_scaleDensity(int inDens, int inMax, int outMax)
   return result;
 }
 
-void pixel_drawWavePixel(int length, int width, int density, byte drawDirection, byte shape) 
-{
+void pixel_drawWavePixel(int length, int width, int density, byte drawDirection, byte shape) {
   // work out how wide each segment should be
   int segmentLength = 0;
 
@@ -328,17 +304,14 @@ void pixel_drawWavePixel(int length, int width, int density, byte drawDirection,
       Serial.println(remainderPerSegment);
     }
     
-    for (int i = 0; i <= density; i++) 
-    {
+    for (int i = 0; i <= density; i++)     {
       totalRemainder += remainderPerSegment;
 
-      if (totalRemainder >= 1.0)
-      {
+      if (totalRemainder >= 1.0)      {
         totalRemainder -= 1.0;
         segmentLength = basicSegLength+1;
       }
-      else
-      {
+      else      {
         segmentLength = basicSegLength;
       }
 
@@ -362,13 +335,11 @@ void pixel_drawWavePixel(int length, int width, int density, byte drawDirection,
   }
 }
 
-void pixel_drawSquarePixel(int length, int width, int density, byte drawDirection) 
-{
+void pixel_drawSquarePixel(int length, int width, int density, byte drawDirection) {
   // work out how wide each segment should be
   int segmentLength = 0;
 
-  if (density > 0)
-  {
+  if (density > 0)  {
     // work out some segment widths
     int basicSegLength = length / density;
     int basicSegRemainder = length % density;
@@ -385,17 +356,14 @@ void pixel_drawSquarePixel(int length, int width, int density, byte drawDirectio
       Serial.println(remainderPerSegment);
     }
     
-    for (int i = 0; i <= density; i++) 
-    {
+    for (int i = 0; i <= density; i++)     {
       totalRemainder += remainderPerSegment;
 
-      if (totalRemainder >= 1.0)
-      {
+      if (totalRemainder >= 1.0)      {
         totalRemainder -= 1.0;
         segmentLength = basicSegLength+1;
       }
-      else
-      {
+      else      {
         segmentLength = basicSegLength;
       }
 
@@ -422,43 +390,33 @@ void pixel_drawSquarePixel(int length, int width, int density, byte drawDirectio
 /* 
 Direction is along A or B axis.
 */
-void pixel_movePairForWave(int amplitude, int length, byte dir, byte shape)
-{
+void pixel_movePairForWave(int amplitude, int length, byte dir, byte shape){
   if (shape == SQUARE_SHAPE)  // square wave
   {
-    if (dir == ALONG_A_AXIS)
-    {
+    if (dir == ALONG_A_AXIS)    {
       moveB(amplitude);
       moveA(length);
     }
-    else if (dir == ALONG_B_AXIS)
-    {
+    else if (dir == ALONG_B_AXIS)    {
       moveA(amplitude);
       moveB(length);
     }
   }
-  else if (shape == SAW_SHAPE)
-  {
-    if (dir == ALONG_A_AXIS)
-    {
+  else if (shape == SAW_SHAPE)  {
+    if (dir == ALONG_A_AXIS)    {
       changeLengthRelative(long(length/2), long(amplitude));
       changeLengthRelative(long(0-(length/2)), long(0-amplitude));
     }
-    else if (dir == ALONG_B_AXIS)
-    {
+    else if (dir == ALONG_B_AXIS)    {
       changeLengthRelative(long(amplitude), long(length/2));
       changeLengthRelative(long(0-amplitude), long(0-(length/2)));
-      
-      
     }
   }
 }
 
-void pixel_drawWaveAlongAxis(int waveAmplitude, int waveLength, int totalWaves, int waveNo, byte dir, byte shape)
-{
+void pixel_drawWaveAlongAxis(int waveAmplitude, int waveLength, int totalWaves, int waveNo, byte dir, byte shape){
   int halfAmplitude = waveAmplitude / 2;
-  if (waveNo == 0) 
-  { 
+  if (waveNo == 0)   { 
     // first one, half a line and an along
     Serial.println("First wave half");
     if (lastWaveWasTop)
@@ -467,16 +425,14 @@ void pixel_drawWaveAlongAxis(int waveAmplitude, int waveLength, int totalWaves, 
       pixel_movePairForWave(0-halfAmplitude, waveLength, dir, shape);
     pixel_flipWaveDirection();
   }
-  else if (waveNo == totalWaves) 
-  { 
+  else if (waveNo == totalWaves)   { 
     // last one, half a line with no along
     if (lastWaveWasTop) 
       pixel_movePairForWave(halfAmplitude, 0, dir, shape);
     else
       pixel_movePairForWave(0-halfAmplitude, 0, dir, shape);
   }
-  else 
-  { 
+  else   { 
     // intervening lines - full lines, and an along
     if (lastWaveWasTop) 
       pixel_movePairForWave(waveAmplitude, waveLength, dir, shape);
@@ -486,16 +442,14 @@ void pixel_drawWaveAlongAxis(int waveAmplitude, int waveLength, int totalWaves, 
   }
 }
 
-void pixel_flipWaveDirection()
-{
+void pixel_flipWaveDirection(){
   if (lastWaveWasTop)
     lastWaveWasTop = false;
   else
     lastWaveWasTop = true;
 }
 
-  void pixel_testPenWidth()
-  {
+  void pixel_testPenWidth()  {
     int rowWidth = multiplier(atoi(inParam1));
     float startWidth = atof(inParam2);
     float endWidth = atof(inParam3); 
@@ -507,8 +461,7 @@ void pixel_flipWaveDirection()
     float oldPenWidth = penWidth;
     int iterations = 0;
     
-    for (float pw = startWidth; pw <= endWidth; pw+=incSize)
-    {
+    for (float pw = startWidth; pw <= endWidth; pw+=incSize)    {
       iterations++;
       penWidth = pw;
       int maxDens = pixel_maxDensity(penWidth, rowWidth);
@@ -535,5 +488,4 @@ void pixel_flipWaveDirection()
     
     penWidth = oldPenWidth;
     globalDrawDirectionMode = tempDirectionMode;
-  }    
-
+}    

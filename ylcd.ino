@@ -197,24 +197,17 @@ void InitKeyboard()
 
 
 
+boolean GetEnter(){    return !digitalRead(BtnEnter_Pin); }
 
-boolean GetEnter()
-{    return !digitalRead(BtnEnter_Pin); }
+boolean GetExit(){    return !digitalRead(BtnExit_Pin); }
 
-boolean GetExit()
-{    return !digitalRead(BtnExit_Pin); }
+boolean GetLeft(){   return !digitalRead(BtnLeft_Pin);  }
 
-boolean GetLeft()
-{   return !digitalRead(BtnLeft_Pin);  }
+boolean GetRight(){    return !digitalRead(BtnRight_Pin); }
 
-boolean GetRight()
-{    return !digitalRead(BtnRight_Pin); }
+boolean GetRotary(){    return !digitalRead(pinC); }
 
-boolean GetRotary()
-{    return !digitalRead(pinC); }
-
-void GetKey()
-{
+void GetKey(){
   unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
   unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
   static boolean oldEnter,oldExit,oldLeft,oldRight; 
@@ -289,8 +282,7 @@ void lcdGetValue(int fcode)
 }
 
 
-void lcd_displayFirstMenu()
-{
+void lcd_displayFirstMenu(){
   lcd.clear();
   currentMenu = MENU_INITIAL;
   currentLine = 1;
@@ -306,7 +298,9 @@ static long oldcounter;
     {lcd.setCursor(14,1);
      oldcounter = commandFileLineCount;   
       if (commandFileLineCount == 0)  lcd.print("       ");
-      else {lcd.print("C"); lcd.print(commandFileLineCount);}   //No. of Commands executed...
+      else {
+        if (commandFileLineCount<100000) lcd.print("C");   //if more than 100000, not enough space to print C 
+        lcd.print(commandFileLineCount);}   //No. of Commands executed...
     }
     
 if (!ForceRefresh && (old_currentMenu == currentMenu) && (old_currentLine == currentLine)) return;
@@ -341,13 +335,11 @@ if (!ForceRefresh && (old_currentMenu == currentMenu) && (old_currentLine == cur
   old_currentMenu = currentMenu; old_currentLine = currentLine;
 }
 
-void ShowRunning()
-{
+void ShowRunning(){
   lcd.setCursor(16,2); if (currentlyRunning) lcd.print("RUN "); else lcd.print("STOP");
 }
 
-void lcd_checkForInput()
-{
+void lcd_checkForInput() {
   static long LastChecked;
   
   if ((millis()-LastChecked)<50) return;
@@ -386,23 +378,21 @@ void lcd_checkForInput()
 }
 
 
-int use_encoder(int curVal,int minVal,int maxVal,int incVal)
+int use_encoder(long curVal,long minVal,long maxVal,int incVal)
 {
-  int actVal,old_actVal;
+  long actVal,old_actVal;
 
   actVal = curVal;  old_actVal=-actVal;
   encoderPos = 0; 
   
-  while (true)
-  {
+  while (true)  {
     delay(100);
     actVal += encoderPos * incVal;
     encoderPos = 0; 
     if (actVal > maxVal) {actVal = maxVal;}
     if (actVal<minVal)   {actVal = minVal;}
     
-    if (actVal != old_actVal)
-      {
+    if (actVal != old_actVal) {
       lcd.setCursor(inputX,inputY);
       lcd.print("<      ");
       lcd.setCursor(inputX+1,inputY);
@@ -492,8 +482,7 @@ void CMDMoveMotorB()
   }    
 }
 
-void SetHomeMotors()
-{
+void SetHomeMotors() {
       motorA.setCurrentPosition(homeA*stepMultiplier);
       motorB.setCurrentPosition(homeB*stepMultiplier);
       engageMotors();
@@ -513,8 +502,7 @@ void PenLiftUpSetup(){
    
   while (! exitflag)
   {
-    while ((millis()-lastcheck)<500)
-      {
+    while ((millis()-lastcheck)<500)      {
       if (GetExit())  {while(GetExit());  exitflag = true; break;}
       if (GetEnter()) {while(GetEnter()); exitflag = true; break;}
       }
@@ -523,11 +511,9 @@ void PenLiftUpSetup(){
     encoderPos = 0;
     if (upPosition <0) upPosition = 0;
     if (upPosition >150) upPosition = 150;
-    if (isPenUp)
-        {
+    if (isPenUp)        {
          penlift_movePen(upPosition, upPosition-10, penLiftSpeed);
-         while ((millis()-lastcheck)<500)
-           {
+         while ((millis()-lastcheck)<500)  {
            if (GetExit())  {while(GetExit());  exitflag = true; break;}
            if (GetEnter()) {while(GetEnter()); exitflag = true; break;}
            }
@@ -552,10 +538,8 @@ void PenLiftDownSetup(){
   exitflag = false;
   lastcheck = millis();
  
-  while (! exitflag)
-  {
-    while ((millis()-lastcheck)<500)
-      {
+  while (! exitflag) {
+    while ((millis()-lastcheck)<500)  {
       if (GetExit())  {while(GetExit());  exitflag = true; break;}
       if (GetEnter()) {while(GetEnter()); exitflag = true; break;}
       }
@@ -565,7 +549,7 @@ void PenLiftDownSetup(){
     if (downPosition <0)   downPosition = 0;
     if (downPosition >150) downPosition = 150;
     if (isPenUp)
-        penlift_movePen(upPosition, downPosition, penLiftSpeed);
+        {penlift_movePen(upPosition, downPosition, penLiftSpeed);}
     else
         {
         penlift_movePen(downPosition, downPosition+10, penLiftSpeed);
@@ -592,8 +576,7 @@ void lcd_processCommand(){
   MenuEncPossible = false;
   Serial.print("button:");
   Serial.println(pressedButton);
-  switch (pressedButton)
-  {
+  switch (pressedButton)  {
     case BUTTON_MACHINE_SPEC:
       lcd_displayMachineSpec();
       break;
@@ -679,7 +662,7 @@ void lcd_processCommand(){
       commandFileLineCount = 0;
       break;
     case BUTTON_DRAW_START_LINE:
-       DrawStartLine = use_encoder(DrawStartLine,0,32000,1);
+       DrawStartLine = use_encoder(DrawStartLine,0,999999,100);
        break;
     case BUTTON_MOVE_INC_DEC_A:
        CMDMoveMotorA();
@@ -758,8 +741,7 @@ void lcd_setCurrentMenu(byte menu){
 /*
 This intialises the LCD itself, and builds the map of the button corner coordinates.
 */
-void lcd_initLCD()
-{
+void lcd_initLCD(){
   lcd.clear();
   lcd.print("Polargraph.");
   lcd.setCursor(0,1);
@@ -769,8 +751,7 @@ void lcd_initLCD()
   delay(500);
 }
 
-void lcd_showSummary()
-{
+void lcd_showSummary(){
   lcd.clear();
   lcd.setCursor(0,1);
       
@@ -809,32 +790,23 @@ void lcd_displayMachineSpec()
   
   if (encoderPos == 2)  {
   lcd.print("Machine  Width:"); lcd.print(machineWidth);
-  lcd.setCursor(0,1);
-  lcd.print("Machine Height:"); lcd.print(machineHeight);
-  lcd.setCursor(0,2);
-  lcd.print("MmPerRev:");  lcd.print(mmPerRev);
-  lcd.setCursor(0,3);
-  lcd.print("StepsPerRev:");  lcd.print(motorStepsPerRev);
+  lcd.setCursor(0,1);  lcd.print("Machine Height:"); lcd.print(machineHeight);
+  lcd.setCursor(0,2);  lcd.print("MmPerRev:");  lcd.print(mmPerRev);
+  lcd.setCursor(0,3);  lcd.print("StepsPerRev:");  lcd.print(motorStepsPerRev);
   }
   
   if (encoderPos == 3)  {  
-  lcd.print("MmPerStep :");  lcd.print(mmPerStep);
-  lcd.setCursor(0,1);
-  lcd.print("StepsPerMM:"); lcd.print(stepsPerMM);
-  lcd.setCursor(0,2);
-  lcd.print("StepMulti :");  lcd.print((int)stepMultiplier);
-  lcd.setCursor(0,3);
+  lcd.print("MmPerStep :");  lcd.print(mmPerStep);  lcd.setCursor(0,1);
+  lcd.print("StepsPerMM:"); lcd.print(stepsPerMM);  lcd.setCursor(0,2);
+  lcd.print("StepMulti :");  lcd.print((int)stepMultiplier);  lcd.setCursor(0,3);
   lcd.print("HomeA"); lcd.print(homeA); lcd.print("B"); lcd.print(homeB);
   }
   
   if (encoderPos == 4)  {
   lcd.print("Page  Width:");  lcd.print(pageWidth);
-  lcd.setCursor(0,1);
-  lcd.print("Page Height:"); lcd.print(pageHeight);
-  lcd.setCursor(0,2);
-  lcd.print("Autostart File:");  
-  lcd.setCursor(5,3);
-  lcd.print(autoStartFilename);
+  lcd.setCursor(0,1);  lcd.print("Page Height:"); lcd.print(pageHeight);
+  lcd.setCursor(0,2);  lcd.print("Autostart File:");  
+  lcd.setCursor(5,3);  lcd.print(autoStartFilename);
   }
   
   if (encoderPos == 5)  {
@@ -849,12 +821,9 @@ void lcd_displayMachineSpec()
       
   if (encoderPos == 7)  {
   lcd.print("Original code:");    
-  lcd.setCursor(0,1);
-  lcd.print("www.polargraph.co.uk");
-  lcd.setCursor(0,2);
-  lcd.print("MOD by Peter Gautier");
-  lcd.setCursor(0,3);
-  lcd.print("        may 23,2020");
+  lcd.setCursor(0,1);  lcd.print("www.polargraph.co.uk");
+  lcd.setCursor(0,2);  lcd.print("MOD by Peter Gautier");
+  lcd.setCursor(0,3);  lcd.print("        05/23/2020");
   }
   while (encoderPos == old_encoderPos)     {    
      if (GetExit()) {while(GetExit()); lcd.clear(); lcd_updateDisplay(true); return;}

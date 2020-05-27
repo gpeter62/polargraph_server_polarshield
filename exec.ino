@@ -24,8 +24,8 @@ boolean exec_executeBasicCommand(char* com) {
   
   commandFileLineCount++;
    if (memcmp(com,CMD_G1,2)==0)  {
-          if (memcmp(inParam1,"Z0",2) == 0)  {inNoOfParams=0; penlift_penUp();}
-          else if (memcmp(inParam1,"Z1",2) == 0)  {inNoOfParams=0; penlift_penDown();}
+          if (memcmp(inParam1,"Z0",2) == 0)  {delay(500); inNoOfParams=0; penlift_penUp();}
+          else if (memcmp(inParam1,"Z1",2) == 0)  {delay(500); inNoOfParams=0; penlift_penDown();}
           else exec_G1();
         }  
   else if (memcmp(com,CMD_CHANGELENGTH,3)==0)
@@ -314,12 +314,10 @@ void exec_changeLengthDirect()
   float startA = motorA.currentPosition();
   float startB = motorB.currentPosition();
 
-  if (endA < 20 || endB < 20 || endA > getMaxLength() || endB > getMaxLength())
-  {
+  if (endA < 20 || endB < 20 || endA > getMaxLength() || endB > getMaxLength())  {
     Serial.println("MSG,E,This point falls outside the area of this machine. Skipping it.");
   }
-  else
-  {
+  else  {
     exec_drawBetweenPoints(startA, startB, endA, endB, maxSegmentLength);
   }
 }  
@@ -436,8 +434,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
     usingAcceleration = true;
     reportPosition();
   }
-  else
-  {
+  else  {
     Serial.println("MSG,E,Line is not on the page. Skipping it.");
   }
 }
@@ -507,9 +504,9 @@ Serial.print("Move: A");   Serial.print(endA1); Serial.print(" B:"); Serial.prin
 //      lcd.print("                    ");
 //      lcd.setCursor(0,1);
       
-        
-      endA1 = (MACH_X_offs + (endA1 + GXoffs) * Gdiv) *  stepsPerMM;
-      endB1 = (MACH_Y_offs + (endB1 + GYoffs) * Gdiv) *  stepsPerMM;
+        endA1 = (MACH_X_offs + (endA1 + GXoffs) * Gdiv) *  stepsPerMM;
+        endB1 = (MACH_Y_offs + (endB1 + GYoffs) * Gdiv) *  stepsPerMM;
+
 //      lcd.print(endA1); lcd.print("/"); lcd.print(endB1); 
 
  

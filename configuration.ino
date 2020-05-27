@@ -44,8 +44,7 @@ void configuration_motorSetup(){
 
 }
 
-void configuration_setup()
-{
+void configuration_setup() {
   sd_initSD();
   lcd_initLCD();
   lcd_showSummary();

@@ -5,8 +5,7 @@
 *  http://www.polargraph.co.uk
 *  https://github.com/euphy/polargraph_server_polarshield
 */
-void msg_reportMinimumGridSizeForPen()
-{
+void msg_reportMinimumGridSizeForPen() {
   
   int segSize = pixel_minSegmentSizeForPen(penWidth);
   
@@ -18,4 +17,3 @@ void msg_reportMinimumGridSizeForPen()
   Serial.print(segSize / stepMultiplier);
   Serial.println(")");
 }
-

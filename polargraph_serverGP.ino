@@ -5,7 +5,7 @@
 *  http://www.polargraph.co.uk
 *  https://github.com/euphy/polargraph_server_polarshield
 *  
-* Modified by Peter Gautier 2017.12.19
+* Greatly modified by Peter Gautier 2020.05.27
 Usable without Polarshield with standard components
 Arduino Mega
 standard LCD 4x20
@@ -14,13 +14,13 @@ standard LCD 4x20
 
 Datalogger Shield with SD card. 
 Modified for MEGA pinout!!!
-UNO  ----> MEGA
-A4,A5  --> Pin 20,21   (SCL,SDA)
-11,12,13-->50,51,52 (SPI bus)
+Pin 20,21   (SCL,SDA)
+50,51,52 (SPI bus)
 2 x TMC2080 stepper driver
 
 Extended command set: G1,G21,G90
 Offset and size% in case of external GCode source
+https://github.com/gpeter62/Drawbot_image_to_gcode_v2
 */
 
 #include <SPI.h>
@@ -98,18 +98,21 @@ static float scaleX = 1.0;
 static float scaleY = 1.0;
 static int rotateTransform = 0;
 
+//Home position: down 120mm from the line of motors
+
 static int machineWidth = 936;
-static int machineHeight = 950;
+static int machineHeight = 770;
 static int sqtest = 0;
 
 // Machine specification defaults
 const int defaultMachineWidth = 936;
-const int defaultMachineHeight = 950;
+const int defaultMachineHeight = 770;
 const int defaultMmPerRev = 48;       //24 fogú tárcsa * 2mm/fog
 const int defaultStepsPerRev = 200;   //200 lépés/360fok
 const int defaultStepMultiplier = 2;
 
-const float homeA = 2191.0;   //in steps
+//Home position of pen: in steps....starting length from motor to HOMEPOINT
+const float homeA = 2191.0;   //   homeA * stepMultiplier/stepsPerMM =    (now it is: 2191*2/8.33 = 526mm)
 const float homeB = 2191.0;
 
 static long startLengthStepsA = 1000;
@@ -118,8 +121,8 @@ static long startLengthStepsB = 1000;
 String machineName = "";
 const String DEFAULT_MACHINE_NAME = "GP180222";  //maximum 10char
 
-static float currentMaxSpeed = 1500.0;
-static float currentAcceleration = 1500.0;
+static float currentMaxSpeed = 1200.0;
+static float currentAcceleration = 1200.0;
 static boolean usingAcceleration = true;
 
 float mmPerStep = 0.0F;
@@ -128,6 +131,15 @@ float stepsPerMM = 0.0F;
 long pageWidth = machineWidth * stepsPerMM;
 long pageHeight = machineHeight * stepsPerMM;
 long maxLength = 0;
+
+//GP koordináta átszámolás a Processing GCode generáló programból
+float GXoffs = 90;    //X eltolás a GCode-ban középről a bal felső sarok lesz a 0 pont
+float GYoffs = 0;      //Y eltolás
+float Gdiv = 1.0;        //nagyítás  (A GCode referencia gép sokkal nagyobb
+float MACH_X_offs = 280;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
+float MACH_Y_offs = 290;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
+long DrawStartLine = 0;
+
 
 //static char rowAxis = 'A';
 const int INLENGTH = 50;
@@ -236,16 +248,6 @@ const char CMD_G1[] = "G1";
 const char CMD_G21[] = "G21";
 const char CMD_G90[] = "G90";
 const char CMD_G99[] = "G99";
-
-//GP koordináta átszámolás a GCode generáló programból
-float GXoffs = 190;    //X eltolás a GCode-ban középről a bal felső sarok lesz a 0 pont
-float GYoffs = 0;    //Y eltolás
-float Gdiv = 1.0;        //nagyítás  (A GCode referencia gép sokkal nagyobb
-float MACH_X_offs = 280;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
-float MACH_Y_offs = 290;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
-long DrawStartLine = 0;
-
-
 
 const char CMD_TESTPENWIDTHSCRIBBLE[] = "C12";
 const char CMD_DRAWSAWPIXEL[] = "C15,";

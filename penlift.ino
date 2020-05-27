@@ -26,21 +26,16 @@ The same goes for the down.
 
 */
 
-void penlift_movePen(int start, int end, int delay_ms)
-{
+void penlift_movePen(int start, int end, int delay_ms) {
   penHeight.attach(PEN_HEIGHT_SERVO_PIN);
-  if(start < end)
-  {
-    for (int i=start; i<=end; i++) 
-    {
+  if(start < end)  {
+    for (int i=start; i<=end; i++) {
       penHeight.write(i);
       delay(delay_ms);
     }
   }
-  else
-  {
-    for (int i=start; i>=end; i--) 
-    {
+  else  {
+    for (int i=start; i>=end; i--) {
       penHeight.write(i);
       delay(delay_ms);
 //      Serial.println(i);
@@ -49,7 +44,7 @@ void penlift_movePen(int start, int end, int delay_ms)
   penHeight.detach();
 }
 
-void penlift_penUp(){
+void penlift_penUp() {
   if (inNoOfParams > 1)  {
     //Serial.print("Penup with params");
     int positionToMoveFrom = isPenUp ? upPosition : downPosition;
@@ -64,7 +59,7 @@ void penlift_penUp(){
   isPenUp = true;
 }
 
-void penlift_penDown(){
+void penlift_penDown() {
   // check to see if this is a multi-action command (if there's a
   // parameter then this sets the "down" motor position too).
   if (inNoOfParams > 1)  {
@@ -80,8 +75,7 @@ void penlift_penDown(){
   isPenUp = false;
 }
 
-void penlift_testRange()
-{
+void penlift_testRange() {
     if (isPenUp) penlift_movePen(upPosition, downPosition, penLiftSpeed);
     delay(200);
     penlift_movePen(downPosition, upPosition, penLiftSpeed);
@@ -91,6 +85,4 @@ void penlift_testRange()
     penlift_movePen(downPosition, upPosition, penLiftSpeed);
     delay(200);
     if (!isPenUp) penlift_movePen(upPosition, downPosition, penLiftSpeed);
-
-          
 }

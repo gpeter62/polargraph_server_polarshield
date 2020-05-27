@@ -17,45 +17,38 @@ whenever a value is written to the EEPROM.
 
 */
 
-void eeprom_resetEeprom()
-{
-  for (int i = 0; i < (EEPROM_END +2); i++)
-  {
+void eeprom_resetEeprom(){
+  for (int i = 0; i < (EEPROM_END +2); i++)  {
     EEPROM.write(i, 0);
   }
   eeprom_loadMachineSpecFromEeprom();
 }
-void eeprom_dumpEeprom()
-{
-  for (int i = 0; i <40; i++)
-  {
+
+void eeprom_dumpEeprom(){
+  for (int i = 0; i <40; i++)  {
     Serial.print(i);
     Serial.print(". ");
     Serial.println(EEPROM.read(i));
   }
 }  
 
-void eeprom_loadMachineSize()
-{
+void eeprom_loadMachineSize(){
   EEPROM_readAnything(EEPROM_MACHINE_WIDTH, machineWidth);
-  if (machineWidth < 1)
-  {
+  if (machineWidth < 1)  {
     machineWidth = defaultMachineWidth;
   }
   Serial.print(F("Loaded machine width:"));
   Serial.println(machineWidth);
   
   EEPROM_readAnything(EEPROM_MACHINE_HEIGHT, machineHeight);
-  if (machineHeight < 1)
-  {
+  if (machineHeight < 1)  {
     machineHeight = defaultMachineHeight;
   }
   Serial.print(F("Loaded machine height:"));
   Serial.println(machineHeight);
 }
 
-void eeprom_loadSpoolSpec()
-{
+void eeprom_loadSpoolSpec() {
   EEPROM_readAnything(EEPROM_MACHINE_MM_PER_REV, mmPerRev);
   if (isnan(mmPerRev)) {
     Serial.println("mmPerRev is nan, being corrected.");
@@ -79,44 +72,37 @@ void eeprom_loadSpoolSpec()
   Serial.println(motorStepsPerRev);
 }  
 
-void eeprom_loadPenLiftRange()
-{
+void eeprom_loadPenLiftRange() {
   EEPROM_readAnything(EEPROM_PENLIFT_DOWN, downPosition);
-  if (downPosition <= 0)
-  {
+  if (downPosition <= 0)  {
     downPosition = DEFAULT_DOWN_POSITION;
   }
   Serial.print(F("Loaded down pos:"));
   Serial.println(downPosition);
 
   EEPROM_readAnything(EEPROM_PENLIFT_UP, upPosition);
-  if (upPosition <= 0)
-  {
+  if (upPosition <= 0)  {
     upPosition = DEFAULT_UP_POSITION;
   }
   Serial.print(F("Loaded up pos:"));
   Serial.println(upPosition);
 }  
 
-void eeprom_loadMachineName()
-{
+void eeprom_loadMachineName(){
   String name = "";
-  for (int i = 0; i < 8; i++)
-  {
+  for (int i = 0; i < 8; i++)  {
     char b = EEPROM.read(EEPROM_MACHINE_NAME+i);
     name = name + b;
   }
   
-  if (name[0] == 0)
-    name = DEFAULT_MACHINE_NAME;
+  if (name[0] == 0)  name = DEFAULT_MACHINE_NAME;
   maxLength = 0;
   machineName = name;
   Serial.print(F("Loaded machine name:"));
   Serial.println(machineName);
 }
 
-void eeprom_loadStepMultiplier()
-{
+void eeprom_loadStepMultiplier() {
   EEPROM_readAnything(EEPROM_MACHINE_STEP_MULTIPLIER, stepMultiplier);
   if (stepMultiplier < 1)  {
     stepMultiplier = defaultStepMultiplier;
@@ -125,8 +111,7 @@ void eeprom_loadStepMultiplier()
   Serial.println(stepMultiplier);  
 }  
 
-void eeprom_loadSpeed()
-{
+void eeprom_loadSpeed() {
   // load speed, acceleration
   EEPROM_readAnything(EEPROM_MACHINE_MOTOR_SPEED, currentMaxSpeed);
   
@@ -147,8 +132,7 @@ void eeprom_loadSpeed()
   Serial.println(currentAcceleration);
 }
 
-void eeprom_GCode_params()
-{
+void eeprom_GCode_params() {
   EEPROM_readAnything(EEPROM_GXOFFS, GXoffs);
   if (GXoffs<0) GXoffs = 190; 
   Serial.print(F("GCODE X offset:"));
@@ -173,11 +157,10 @@ void eeprom_GCode_params()
   if (MACH_Y_offs <0) MACH_Y_offs = 290.0;
   Serial.print(F("GCODE MACHINE Y offset:"));
   Serial.println(MACH_Y_offs);
-  }
+}
 
 
-void eeprom_loadMachineSpecFromEeprom()
-{
+void eeprom_loadMachineSpecFromEeprom() {
   impl_loadMachineSpecFromEeprom();
 
   eeprom_loadMachineSize();
@@ -215,8 +198,7 @@ void eeprom_loadMachineSpecFromEeprom()
   maxLength = 0;
 }
 
-void eeprom_save_factory_defaults()
-{
+void eeprom_save_factory_defaults() {
     EEPROM_writeAnything(EEPROM_MACHINE_WIDTH, defaultMachineWidth);
     EEPROM_writeAnything(EEPROM_MACHINE_HEIGHT, defaultMachineHeight);
     for (int i = 0; i < 8; i++)

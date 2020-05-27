@@ -85,13 +85,11 @@ void transform(float &tA, float &tB){
   
 }
 
-void changeLength(long tA, long tB)
-{
+void changeLength(long tA, long tB) {
   changeLength((float)tA, (float)tB);
 }
 
-void changeLength(float tA, float tB)
-{
+void changeLength(float tA, float tB) {
 //  Serial.println("changeLenth-float");
   lastOperationTime = millis();
 
@@ -116,8 +114,7 @@ void changeLength(float tA, float tB)
   motorB.moveTo(tB);
   
   
-  if (!usingAcceleration)
-  {
+  if (!usingAcceleration)  {
     // The moveTo() function changes the speed in order to do a proper
     // acceleration. This counteracts it. Ha.
     
@@ -140,22 +137,18 @@ void changeLength(float tA, float tB)
   }
   
   
-  while (motorA.distanceToGo() != 0 || motorB.distanceToGo() != 0)
-  {
+  while (motorA.distanceToGo() != 0 || motorB.distanceToGo() != 0)  {
 //    Serial.print("dA:");
 //    Serial.print(motorA.distanceToGo());
 //    Serial.print(", dB:");
 //    Serial.println(motorB.distanceToGo());
     impl_runBackgroundProcesses();
-    if (currentlyRunning)
-    {
-      if (usingAcceleration)
-      {
+    if (currentlyRunning)  {
+      if (usingAcceleration) {
         motorA.run();
         motorB.run();
       }
-      else
-      {
+      else  {
 //        Serial.print("Run speed..");
 //        Serial.println(motorA.speed());
         motorA.runSpeedToPosition();
@@ -167,28 +160,23 @@ void changeLength(float tA, float tB)
   reportPosition();
 }
 
-void changeLengthRelative(float tA, float tB)
-{
+void changeLengthRelative(float tA, float tB) {
   changeLengthRelative((long) tA, (long)tB);
 }
-void changeLengthRelative(long tA, long tB)
-{
+
+void changeLengthRelative(long tA, long tB) {
   lastOperationTime = millis();
   motorA.move(tA);
   motorB.move(tB);
   
-  while (motorA.distanceToGo() != 0 || motorB.distanceToGo() != 0)
-  {
+  while (motorA.distanceToGo() != 0 || motorB.distanceToGo() != 0)  {
     impl_runBackgroundProcesses();
-    if (currentlyRunning)
-    {
-      if (usingAcceleration)
-      {
+    if (currentlyRunning)    {
+      if (usingAcceleration) {
         motorA.run();
         motorB.run();
       }
-      else
-      {
+      else {
         motorA.runSpeedToPosition();
         motorB.runSpeedToPosition();
       }
@@ -198,10 +186,8 @@ void changeLengthRelative(long tA, long tB)
   reportPosition();
 }
 
-long getMaxLength()
-{
-  if (maxLength == 0)
-  {
+long getMaxLength() {
+  if (maxLength == 0)  {
     float length = getMachineA(pageWidth, pageHeight);
     maxLength = long(length+0.5);
     Serial.print("Calculated maxLength: ");
@@ -211,22 +197,19 @@ long getMaxLength()
 }
 
 
-float getMachineA(float cX, float cY)
-{
+float getMachineA(float cX, float cY) {
   float a = sqrt(sq(cX)+sq(cY));
   return a;
 }
-float getMachineB(float cX, float cY)
-{
+
+float getMachineB(float cX, float cY) {
   float b = sqrt(sq((pageWidth)-cX)+sq(cY));
   return b;
 }
 
-void moveA(int dist)
-{
+void moveA(int dist) {
   motorA.move(dist);
-  while (motorA.distanceToGo() != 0)
-  {
+  while (motorA.distanceToGo() != 0)  {
     impl_runBackgroundProcesses();
     if (currentlyRunning)
       motorA.run();
@@ -234,11 +217,9 @@ void moveA(int dist)
   lastOperationTime = millis();
 }
 
-void moveB(int dist)
-{
+void moveB(int dist) {
   motorB.move(dist);
-  while (motorB.distanceToGo() != 0)
-  {
+  while (motorB.distanceToGo() != 0)  {
     impl_runBackgroundProcesses();
     if (currentlyRunning)
       motorB.run();
@@ -246,8 +227,7 @@ void moveB(int dist)
   lastOperationTime = millis();
 }
 
-void reportPosition()
-{
+void reportPosition() {
   if (reportingPosition)
   {
     Serial.print(OUT_CMD_SYNC_STR);
@@ -270,19 +250,16 @@ void reportPosition()
 
 
 
-void engageMotors()
-{
+void engageMotors() {
   impl_engageMotors();
 }
 
-void releaseMotors()
-{
+void releaseMotors() {
   impl_releaseMotors();
 }
 
 
-float getCartesianXFP(float aPos, float bPos)
-{
+float getCartesianXFP(float aPos, float bPos) {
 //  Serial.print("aPos: ");
 //  Serial.print(aPos);
 //  Serial.print(" bPos: ");
@@ -315,8 +292,7 @@ float getCartesianXFP(float aPos, float bPos)
   
   return calcX;  
 }
-float getCartesianYFP(float cX, float aPos) 
-{
+float getCartesianYFP(float cX, float aPos) {
 //  Serial.print("aPos: ");
 //  Serial.print(aPos);
 //  Serial.print(" cx: ");
@@ -327,14 +303,13 @@ float getCartesianYFP(float cX, float aPos)
 //  Serial.print(" cx: ");
 //  Serial.println(sq(cX));
 
-  float calcY = sqrt(sq(aPos)-sq(cX));
+float calcY = sqrt(sq(aPos)-sq(cX));
 //  Serial.print("CalcY: ");
 //  Serial.println(calcY);
   return calcY;
 }
 
-long getCartesianX(float aPos, float bPos)
-{
+long getCartesianX(float aPos, float bPos) {
   long calcX = long((pow(pageWidth, 2) - pow(bPos, 2) + pow(aPos, 2)) / (pageWidth*2));
   return calcX;  
 }

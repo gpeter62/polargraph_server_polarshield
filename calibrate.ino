@@ -18,8 +18,7 @@ distance from the sprocket.
    Here is the calibration routines
    =============================================================================*/
    
-void calibrate_doCalibration()
-{
+void calibrate_doCalibration() {
   Serial.println("Doing calibration.");
   // raise pen
   penlift_penUp();
@@ -138,4 +137,3 @@ void calibrate_doCalibration()
   isCalibrated = true;
   
 }
-

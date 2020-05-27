@@ -16,8 +16,7 @@ implementation of the spiral pixel.
 
 */
 
-void curves_pixel_drawCircularPixel() 
-{
+void curves_pixel_drawCircularPixel() {
     long originA = multiplier(atol(inParam1));
     long originB = multiplier(atol(inParam2));
     int size = multiplier(atoi(inParam3));
@@ -117,8 +116,7 @@ void curves_drawCircle(long centerx, long centery, int radius) {
   }
 }
 
-void curves_drawSpiral(long centerx, long centery, int maxRadius, int increment, int density) 
-{
+void curves_drawSpiral(long centerx, long centery, int maxRadius, int increment, int density) {
   Serial.println("Draw spiral.");
   Serial.print("Max radius: ");
   Serial.println(maxRadius);
@@ -191,4 +189,3 @@ void curves_drawSpiral(long centerx, long centery, int maxRadius, int increment,
   }
   Serial.println("Finished spiral pixel.");
 }
-
