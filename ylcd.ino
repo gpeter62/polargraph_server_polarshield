@@ -378,8 +378,7 @@ void lcd_checkForInput() {
 }
 
 
-int use_encoder(long curVal,long minVal,long maxVal,int incVal)
-{
+int use_encoder(long curVal,long minVal,long maxVal,int incVal){
   long actVal,old_actVal;
 
   actVal = curVal;  old_actVal=-actVal;
@@ -406,8 +405,7 @@ int use_encoder(long curVal,long minVal,long maxVal,int incVal)
   }   
 }
 
-void use_encoderFile()
-{
+void use_encoderFile() {
   int old_encoderPos=-9999;
   if (NoOfFiles == 0) return;
   
@@ -691,23 +689,23 @@ void lcd_processCommand(){
       delay(1000);
       break;
     case BUTTON_GXOFFS:
-      GXoffs = use_encoder((int)GXoffs,0,1000,1);
+      GXoffs = use_encoder((int)GXoffs,-200,1000,1);
       EEPROM_writeAnything(EEPROM_GXOFFS, (float)GXoffs);
       break;   
     case BUTTON_GYOFFS:
-      GYoffs = use_encoder((int)GYoffs,0,1000,1);
+      GYoffs = use_encoder((int)GYoffs,-200,1000,1);
       EEPROM_writeAnything(EEPROM_GYOFFS, (float)GYoffs);
       break;   
     case BUTTON_GDIV:
-      Gdiv = (float)use_encoder((int)(Gdiv*100),5,200,1) /100;
+      Gdiv = (float)use_encoder((long)(Gdiv*100),5,200,1) /100;
       EEPROM_writeAnything(EEPROM_GDIV,(float)Gdiv);
       break;   
      case BUTTON_MACH_X_OFFS:
-      MACH_X_offs = use_encoder((int)MACH_X_offs,0,1000,1);
+      MACH_X_offs = use_encoder((long)MACH_X_offs,-200,1000,1);
       EEPROM_writeAnything(EEPROM_MACH_X_OFFS, (float)MACH_X_offs);
       break;   
     case BUTTON_MACH_Y_OFFS:
-      MACH_Y_offs = use_encoder((int)MACH_Y_offs,0,1000,1);
+      MACH_Y_offs = use_encoder((long)MACH_Y_offs,-200,1000,1);
       EEPROM_writeAnything(EEPROM_MACH_Y_OFFS, (float)MACH_Y_offs);
       break;    
     case BUTTON_FACTORY_RESET:

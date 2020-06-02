@@ -134,12 +134,12 @@ void eeprom_loadSpeed() {
 
 void eeprom_GCode_params() {
   EEPROM_readAnything(EEPROM_GXOFFS, GXoffs);
-  if (GXoffs<0) GXoffs = 190; 
+  if (GXoffs<-200) GXoffs = 0; 
   Serial.print(F("GCODE X offset:"));
   Serial.println(GXoffs);
   
   EEPROM_readAnything(EEPROM_GYOFFS, GYoffs);
-  if (GYoffs<0) GYoffs = 0; 
+  if (GYoffs<-200) GYoffs = 0; 
   Serial.print(F("GCODE Y offset:"));
   Serial.println(GYoffs);
   
@@ -149,12 +149,12 @@ void eeprom_GCode_params() {
   Serial.println(Gdiv);
   
   EEPROM_readAnything(EEPROM_MACH_X_OFFS,MACH_X_offs);
-  if (MACH_X_offs<0) MACH_X_offs = 190.0; 
+  if (MACH_X_offs<200) MACH_X_offs = 0.0; 
   Serial.print(F("GCODE MACHINE X offset:"));
   Serial.println(MACH_X_offs);
   
   EEPROM_readAnything(EEPROM_MACH_Y_OFFS,MACH_Y_offs);
-  if (MACH_Y_offs <0) MACH_Y_offs = 290.0;
+  if (MACH_Y_offs <200) MACH_Y_offs = 0.0;
   Serial.print(F("GCODE MACHINE Y offset:"));
   Serial.println(MACH_Y_offs);
 }

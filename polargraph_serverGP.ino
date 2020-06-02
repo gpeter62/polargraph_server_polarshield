@@ -100,16 +100,16 @@ static int rotateTransform = 0;
 
 //Home position: down 120mm from the line of motors
 
-static int machineWidth = 936;
-static int machineHeight = 770;
-static int sqtest = 0;
-
 // Machine specification defaults
 const int defaultMachineWidth = 936;
-const int defaultMachineHeight = 770;
+const int defaultMachineHeight = 850;
 const int defaultMmPerRev = 48;       //24 fogú tárcsa * 2mm/fog
 const int defaultStepsPerRev = 200;   //200 lépés/360fok
 const int defaultStepMultiplier = 2;
+
+static int machineWidth = defaultMachineWidth;
+static int machineHeight = defaultMachineHeight;
+static int sqtest = 0;
 
 //Home position of pen: in steps....starting length from motor to HOMEPOINT
 const float homeA = 2191.0;   //   homeA * stepMultiplier/stepsPerMM =    (now it is: 2191*2/8.33 = 526mm)
@@ -133,9 +133,9 @@ long pageHeight = machineHeight * stepsPerMM;
 long maxLength = 0;
 
 //GP koordináta átszámolás a Processing GCode generáló programból
-float GXoffs = 90;    //X eltolás a GCode-ban középről a bal felső sarok lesz a 0 pont
-float GYoffs = 0;      //Y eltolás
-float Gdiv = 1.0;        //nagyítás  (A GCode referencia gép sokkal nagyobb
+float GXoffs = 90;        //X eltolás a GCode-ban középről a bal felső sarok lesz a 0 pont
+float GYoffs = 0;         //Y eltolás
+float Gdiv = 1.0;         //nagyítás  (A GCode referencia gép sokkal nagyobb
 float MACH_X_offs = 280;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
 float MACH_Y_offs = 290;  //a konkrét gépnél itt van a papír bal felső sarka, mm-ben
 long DrawStartLine = 0;
