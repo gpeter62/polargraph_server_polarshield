@@ -316,6 +316,7 @@ void exec_changeLengthDirect()
 
   if (endA < 20 || endB < 20 || endA > getMaxLength() || endB > getMaxLength())  {
     Serial.println("MSG,E,This point falls outside the area of this machine. Skipping it.");
+    Serial.print(endA); Serial.print("/"); Serial.print(endB); Serial.print("  max:"); Serial.println(getMaxLength());
   }
   else  {
     exec_drawBetweenPoints(startA, startB, endA, endB, maxSegmentLength);
@@ -350,15 +351,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
   float c2x = getCartesianXFP(p2a, p2b);
   float c2y = getCartesianYFP(c2x, p2a);
   
-//  Serial.print("From coords: ");
-//  Serial.print(c1x);
-//  Serial.print(",");
-//  Serial.println(c1y);
-//  Serial.print("To coords: ");
-//  Serial.print(c2x);
-//  Serial.print(",");
-//  Serial.println(c2y);
-  
+ 
   // test to see if it's on the page
   // AND ALSO TO see if the current position is on the page.
   // Remember, the native system can easily specify points that can't exist,
@@ -404,8 +397,7 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
     long runSpeed = 0;
 
     usingAcceleration = false;
-    while (linesegs > 0)
-    {
+    while (linesegs > 0)  {
 //      Serial.print("Line segment: " );
 //      Serial.println(linesegs);
       // compute next new location
@@ -436,6 +428,8 @@ void exec_drawBetweenPoints(float p1a, float p1b, float p2a, float p2b, int maxS
   }
   else  {
     Serial.println("MSG,E,Line is not on the page. Skipping it.");
+    Serial.print("From coords: ");  Serial.print(c1x);  Serial.print(",");  Serial.println(c1y);
+    Serial.print("To coords: ");  Serial.print(c2x);  Serial.print(",");  Serial.println(c2y);
   }
 }
 
@@ -499,17 +493,13 @@ void exec_G1() {   //G1 move relative to the last point
       float endA1 = (float)atof(inParam1);
       float endB1 = (float)atof(inParam2);
       float endA2,endB2;
-Serial.print("Move: A");   Serial.print(endA1); Serial.print(" B:"); Serial.println(endB1);
-//      lcd.setCursor(0,1);
-//      lcd.print("                    ");
-//      lcd.setCursor(0,1);
+      Serial.print("Line:"); Serial.print(commandFileLineCount);
+      Serial.print("  Move: A");   Serial.print(endA1); Serial.print(" B:"); Serial.println(endB1);
       
-        endA1 = (MACH_X_offs + (endA1 + GXoffs) * Gdiv) *  stepsPerMM;
-        endB1 = (MACH_Y_offs + (endB1 + GYoffs) * Gdiv) *  stepsPerMM;
-
-//      lcd.print(endA1); lcd.print("/"); lcd.print(endB1); 
-
- 
+      endA1 = (MACH_X_offs + (endA1 + GXoffs) * Gdiv) *  stepsPerMM;
+      endB1 = (MACH_Y_offs + (endB1 + GYoffs) * Gdiv) *  stepsPerMM;
+      Serial.print("ABSMove: A");   Serial.print(endA1); Serial.print(" B:"); Serial.println(endB1);
+        
       endA2 = getMachineA(endA1,endB1) / stepMultiplier; 
       endB2 = getMachineB(endA1,endB1) / stepMultiplier;    //visszaszámolás a gép rendszerébe
 //      lcd.print(endA2); lcd.print("/"); lcd.print(endB2); 

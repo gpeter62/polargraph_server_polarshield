@@ -178,7 +178,10 @@ void impl_exec_execFromStore(String inFilename){
           command[comptr] = 0;  //terminating 0
           if (memcmp(command,CMD_G99,3)==0) {
             Serial.print("Comment:"); Serial.println(command);    //Comment - only to print!!!
+            commandFileLineCount++;
           }
+          else if ((DrawStartLine>0) && (commandFileLineCount<DrawStartLine)) //skip drawing, before starting line
+              commandFileLineCount++;
           else {   //valid command, parse and execute...
             strncpy(lastCommand,command,min(strlen(command),sizeof(lastCommand)));
             commandParsed = comms_parseCommand(lastCommand);
